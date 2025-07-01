@@ -23,6 +23,17 @@ model Paciente {
 
 }
 
+model Agenda_Psicologo{
+ id Int @id @default(autoincrement())
+ status_disponibilidade Boolean
+ isLogged Boolean
+ atendimento TipoAtendimento @default(video)
+ limiteAtendimento Int
+ psicologoId Int @unique(map:"psicologoId")
+ psicologo Psicologo    @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, onUpdate: Cascade, map: "atendimento_ibfk_1")
+ 
+}
+
 model Psicologo {
   psycId     Int     @id @default(autoincrement())
   nome    String?  @db.VarChar(255)
@@ -34,29 +45,29 @@ model Psicologo {
   updatedAt DateTime @updatedAt
   role Role @default(PSICOLOGO)
   avaliacao Avaliacao[]
+  agenda_Psicologo Agenda_Psicologo? //note o “?”: um pscologo tem no máximo 1 agenda
+  sessao Sessao[]
 }
 
 model User {
   id      Int      @id @default(autoincrement())
   isAnonimo   Boolean  @default(false)
   role Role @default(PACIENTE)
-  pacientes    Paciente?
+  pacientes    Paciente? //note o “?”: um user tem no máximo 1 paciente
   avaliacao Avaliacao[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sessao Sessao[]
+  // atendimento TipoAtendimento? // aqui representa algo notRequired
 }
 
-enum Role {
-  PACIENTE
-  PSICOLOGO
-}
 
 model Avaliacao{
   idStars Int  @id @default(autoincrement())
   sms String @db.VarChar(255)
   userId  Int 
   psicologoId  Int
-  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade, map: "Stars_ibfk_1")
+  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade, map: "stars_ibfk_1")
   psicologo      Psicologo     @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, onUpdate: Cascade)
   
 }
@@ -70,6 +81,15 @@ model LogAtividade {
   data      DateTime @default(now())
 }
 
+model Sessao{
+  sessaoId Int @id @default(autoincrement())
+  status statusSessao
+  userId  Int 
+  psicologoId  Int
+  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade, map: "Stars_ibfk_1")
+  psicologo      Psicologo     @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, onUpdate: Cascade)
+}
+
 enum TipoLog {
   login
   logout
@@ -79,4 +99,18 @@ enum TipoLog {
   fim_sessao
   mensagem
   erro
+}
+enum  TipoAtendimento {
+  video
+  chat
+}
+enum Role {
+  PACIENTE
+  PSICOLOGO
+}
+
+
+enum statusSessao{
+  ativa
+  finalizada
 }
