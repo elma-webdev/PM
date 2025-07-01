@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma" 
+}
+// output   = "../src/generated/prisma"  gerado pelo prisma generate, pdoe ser apagado pra deixxar o padrao
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Paciente {
+  pacId        Int      @id  @default(autoincrement())
+  nome    String  @db.VarChar(255)
+  idade Decimal?
+  password String
+  photo String?
+  email   String   @unique(map: "email") @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  telefone Int?
+  userId  Int @unique(map: "userId")
+  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade, map: "Pacientes_ibfk_1")
+
+}
+
+model Psicologo {
+  psycId     Int     @id @default(autoincrement())
+  nome    String?  @db.VarChar(255)
+  password String
+  photo String?
+  email   String   @unique(map: "email") @db.VarChar(255)
+  bio    String? @db.VarChar(500)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  role Role @default(PSICOLOGO)
+  avaliacao Avaliacao[]
+}
+
+model User {
+  id      Int      @id @default(autoincrement())
+  isAnonimo   Boolean  @default(false)
+  role Role @default(PACIENTE)
+  pacientes    Paciente?
+  avaliacao Avaliacao[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  PACIENTE
+  PSICOLOGO
+}
+
+model Avaliacao{
+  idStars Int  @id @default(autoincrement())
+  sms String @db.VarChar(255)
+  userId  Int 
+  psicologoId  Int
+  User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade, map: "Stars_ibfk_1")
+  psicologo      Psicologo     @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, onUpdate: Cascade)
+  
+}
+// field>> nome do campo que faz papel de chave estrangeira. references>> nome da pk da tabela original
+
+model LogAtividade {
+  id        Int      @id @default(autoincrement())
+  usuarioId Int
+  tipo      TipoLog
+  mensagem  String
+  data      DateTime @default(now())
+}
+
+enum TipoLog {
+  login
+  logout
+  inicio_triagem
+  conclusao_triagem
+  inicio_sessao
+  fim_sessao
+  mensagem
+  erro
+}
