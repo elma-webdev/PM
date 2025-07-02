@@ -25,8 +25,8 @@ model Paciente {
 
 model Agenda_Psicologo{
  id Int @id @default(autoincrement())
- status_disponibilidade Boolean
- isLogged Boolean
+ status_disponibilidade Boolean?
+ isLogged Boolean?
  atendimento TipoAtendimento @default(video)
  limiteAtendimento Int
  psicologoId Int @unique(map:"psicologoId")
@@ -83,7 +83,9 @@ model LogAtividade {
 
 model Sessao{
   sessaoId Int @id @default(autoincrement())
-  status statusSessao
+  status statusSessao?
+  inicio DateTime @default(now())
+  fim DateTime?
   userId  Int 
   psicologoId  Int
   User      User     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: Cascade, map: "Stars_ibfk_1")
