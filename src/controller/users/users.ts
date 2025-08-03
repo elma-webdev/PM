@@ -16,7 +16,7 @@ export async function createPaciente(req: Request, res: Response): Promise<any> 
         password,
         idade,
         photo,
-        User: {
+        user: {
           create: {
             role: "PACIENTE",
             isAnonimo: false,
@@ -27,16 +27,16 @@ export async function createPaciente(req: Request, res: Response): Promise<any> 
         nome: true,
         email: true,
         telefone: true,
-        User:{
+        user: {
           select: {
             id: true,
-            isAnonimo: true
-          }
-        }
+            isAnonimo: true,
+          },
+        },
       },
     });
 
-    await createLog("Novo paciente cadastrado no sistema", "login", paciente.User.id)
+    await createLog("Novo paciente cadastrado no sistema", "create_account", paciente.user.id)
     res.status(201).json(paciente);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -74,6 +74,24 @@ export async function createAnonimo(req: Request, res: Response): Promise<any> {
         isAnonimo: true,
       },
       select: {
+        id: true,
+        role: true,
+        isAnonimo: true,
+      },
+    });
+    res.json(anonimo);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(500).json({ message: err.message });
+    }
+    return res.status(500).json({ message: "Erro desconhecido." });
+  }
+}
+export async function getAnonimo(req: Request, res: Response): Promise<any> {
+  try {
+    const anonimo = await prisma.user.findMany({
+      select: {
+        id: true,
         role: true,
         isAnonimo: true,
       },

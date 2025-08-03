@@ -8,7 +8,7 @@ export async function createLog(
   tipo: TipoLog,
   usuarioId: number
 ): Promise<any> {
-  const log = await prisma.logAtividade.create({
+  const log = await prisma.logatividade.create({
     data: {
       mensagem,
       tipo,
@@ -17,4 +17,3 @@ export async function createLog(
   });
   return log;
 }   
-console.log(createLog);

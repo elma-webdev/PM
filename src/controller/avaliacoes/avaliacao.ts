@@ -27,7 +27,7 @@ export async function getAvaliacoes(_req: Request, res: Response): Promise<any> 
       include: {
         User: {
           select: {
-            pacientes: {
+            paciente: {
               select: {
                 email: true,
                 nome: true,
@@ -61,7 +61,7 @@ export async function getAvaliacaoById(req: Request, res: Response): Promise<any
       include: {
         User: {
           select: {
-            pacientes: {
+            paciente: {
               select: {
                 email: true,
                 nome: true,

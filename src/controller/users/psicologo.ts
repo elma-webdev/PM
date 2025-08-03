@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "../../generated/prisma";
+import { createLog } from "../../../utils/fcuntion.log";
 
 const prisma = new PrismaClient();
 
@@ -25,7 +26,7 @@ export async function createPsicologo(req: Request, res: Response): Promise<any>
         role: true,
       },
     });
-
+    await createLog("Novo psicologo cadastrado no sistema", "create_account", novoPsicologo.psycId)
     return res.status(201).json(novoPsicologo);
   } catch (err: unknown) {
     if (err instanceof Error) {
