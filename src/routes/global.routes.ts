@@ -1,23 +1,28 @@
-import  {userRouter} from "./users.routes";
+import {pacienteRouter} from "./paciente.routes.js";
 import { Router} from "express";
-import { psyRouter } from "./psicologos.routes";
-import { avaliacaoRouter } from "./avaliacao.routes";
-import { logRouter } from "./log.routes";
-import { triagemRouter } from "./triagem.routes";
-import { filaRouter } from "./fila.routes";
-import { loginRouter } from "./auth.routes";
-import { agendaRouter } from "./agendas.routes";
-
+import { avaliacaoRouter } from "./avaliacao.routes.js";
+import { logRouter } from "./log.routes.js";
+import { triagemRouter } from "./triagem.routes.js";
+import { filaRouter } from "./fila.routes.js";
+import { loginRouter } from "./auth.routes.js";
+import { agendaRouter } from "./agendas.routes.js";
+import { sessionRouter } from "./session.route.js";
+import { postRouter } from "./post.routes.js";
+import { adminRouter } from "./admin.routes.js";
+import { psyRouter } from "./psicologos.routes.js";
 
 const globalRouter=Router();
 
-globalRouter.use('/users', userRouter);
-globalRouter.use("/psyc", psyRouter);
-globalRouter.use("/rate", avaliacaoRouter);
-globalRouter.use("/log", logRouter); 
-globalRouter.use("/triagem", triagemRouter); 
-globalRouter.use("/auth", loginRouter);
-globalRouter.use("/fila", filaRouter);
-globalRouter.use("/agenda", agendaRouter);
+globalRouter.use(adminRouter);
+globalRouter.use(loginRouter);
+globalRouter.use(agendaRouter);
+globalRouter.use(postRouter);
+globalRouter.use(pacienteRouter);
+globalRouter.use(psyRouter);
+globalRouter.use(avaliacaoRouter);
+globalRouter.use(logRouter); 
+globalRouter.use(triagemRouter); 
+globalRouter.use(filaRouter);
+globalRouter.use(sessionRouter);
 
 export {globalRouter};

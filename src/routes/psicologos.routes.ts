@@ -1,18 +1,37 @@
 import { Router } from "express";
-import {
-  createPsicologo,
-  getPsicologos,
-  getPsicologoById,
-  updatePsicologo,
-  deletePsicologo,
-} from "../controller/users/psicologo";
-
+import * as PsicologoController from "../controller/users/psicologo.js";
+import { Auth } from "../middleware/Auth.js";
 const psyRouter = Router();
 
-psyRouter.post("/create-psyc", createPsicologo);
-psyRouter.get("/get-psyc", getPsicologos);
-psyRouter.get("/get-psyc/:id", getPsicologoById);
-psyRouter.put("/update-psyc/:id", updatePsicologo);
-psyRouter.delete("/delete-psyc/:id", deletePsicologo);
+import multer from "multer";
+const upload = multer({ storage:multer.memoryStorage() });
 
-export {psyRouter};
+psyRouter.get("/users", (req, res) => {
+  console.log("Rota /api/users chamada!");
+  res.send("ok");
+});
+psyRouter.post("/psicologo", upload.single('photo'), PsicologoController.createPsicologo);
+
+
+psyRouter.get(
+  "/psicologo",
+  Auth,
+  PsicologoController.getPsicologos
+);
+
+psyRouter.get(
+  "/psicologo/:id",
+  Auth,
+  PsicologoController.getPsicologoById
+);
+psyRouter.put(
+  "/psicologo/:id",
+  Auth,
+  PsicologoController.updatePsicologo
+);
+psyRouter.delete(
+  "/psicologo/:id",
+  Auth,
+  PsicologoController.deletePsicologo
+);
+export { psyRouter };

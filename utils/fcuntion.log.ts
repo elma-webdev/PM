@@ -1,19 +1,22 @@
-import {PrismaClient, TipoLog} from '../src/generated/prisma'
 import { Request, Response } from "express";
-
-const prisma = new PrismaClient();
+import { prisma } from "../lib/prisma.js";
 
 export async function createLog(
   mensagem: string,
-  tipo: TipoLog,
-  usuarioId: number
+  tipo: number,
+  usuarioId: string
 ): Promise<any> {
-  const log = await prisma.logatividade.create({
-    data: {
-      mensagem,
-      tipo,
-      usuarioId,
-    },
-  });
-  return log;
+  try{
+    
+    await prisma.logatividade.create({
+      data: {
+        mensagem,
+        tipo,
+        user_id:usuarioId
+      },
+    });
+  }catch(err){
+    console.log(err)
+  }
+
 }   

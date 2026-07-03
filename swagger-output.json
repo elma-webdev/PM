@@ -5,13 +5,13 @@
     "description": "Documentação automática com Swagger Autogen",
     "version": "1.0.0"
   },
-  "host": "localhost:3000/api/",
+  "host": "localhost:3000/api",
   "basePath": "/",
   "schemes": [
     "http"
   ],
   "paths": {
-    "/users/create-paciente": {
+    "/users/paciente": {
       "post": {
         "description": "",
         "parameters": [
@@ -38,6 +38,9 @@
                 },
                 "photo": {
                   "example": "any"
+                },
+                "sobrenome": {
+                  "example": "any"
                 }
               }
             }
@@ -47,18 +50,31 @@
           "201": {
             "description": "Created"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
       }
     },
-    "/users/get-paciente": {
+    "/users/paciente/": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -66,20 +82,27 @@
         }
       }
     },
-    "/users/user": {
-      "post": {
+    "/users/user/": {
+      "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           },
-          "500": {
-            "description": "Internal Server Error"
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/psyc/create-psyc": {
+    "/psycho/psicologo": {
       "post": {
         "description": "",
         "parameters": [
@@ -103,6 +126,12 @@
                 },
                 "bio": {
                   "example": "any"
+                },
+                "role": {
+                  "example": "any"
+                },
+                "sobrenome": {
+                  "example": "any"
                 }
               }
             }
@@ -118,12 +147,22 @@
         }
       }
     },
-    "/psyc/get-psyc": {
+    "/psycho/psicologo/": {
       "get": {
         "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -131,7 +170,7 @@
         }
       }
     },
-    "/psyc/get-psyc/{id}": {
+    "/psycho/psicologo/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -140,11 +179,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -153,9 +200,7 @@
             "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/psyc/update-psyc/{id}": {
+      },
       "put": {
         "description": "",
         "parameters": [
@@ -163,6 +208,11 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           },
           {
@@ -188,13 +238,14 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/psyc/delete-psyc/{id}": {
+      },
       "delete": {
         "description": "",
         "parameters": [
@@ -203,11 +254,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -215,20 +274,15 @@
         }
       }
     },
-    "/psyc/{create-psyc{where{psycId:id}}": {
-      "delete": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/rate/create-rate": {
+    "/rate/rate": {
       "post": {
         "description": "",
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -236,9 +290,6 @@
               "type": "object",
               "properties": {
                 "sms": {
-                  "example": "any"
-                },
-                "userId": {
                   "example": "any"
                 },
                 "psicologoId": {
@@ -252,18 +303,8 @@
           "201": {
             "description": "Created"
           },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/rate/get-rate": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -271,7 +312,30 @@
         }
       }
     },
-    "/rate/get-rate/{id}": {
+    "/rate/rate/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/rate/rate/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -280,11 +344,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "404": {
             "description": "Not Found"
@@ -293,9 +365,7 @@
             "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/rate/update-rate/{id}": {
+      },
       "put": {
         "description": "",
         "parameters": [
@@ -303,6 +373,11 @@
             "name": "id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           },
           {
@@ -322,13 +397,14 @@
           "200": {
             "description": "OK"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/rate/delete-rate/{id}": {
+      },
       "delete": {
         "description": "",
         "parameters": [
@@ -337,34 +413,19 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "204": {
             "description": "No Content"
           },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/rate/{create-rate{where{idStars:Number(id)}});returnres.status(204).send();}catch(err:unknown){if(errinstanceofError){returnres.status(500).json({message:err.message});}returnres.status(500).json({message:Errodesconhecido.});}}}": {
-      "delete": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
-          }
-        }
-      }
-    },
-    "/log/get-logs": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
@@ -372,12 +433,56 @@
         }
       }
     },
-    "/log/get-log": {
+    "/rate/{rate{where{idStars:Number(id)}});returnres.status(204).send();}catch(err:unknown){if(errinstanceofError){returnres.status(500).json({message:err.message});}returnres.status(500).json({message:Errodesconhecido.});}}}": {
+      "delete": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "rate{where{idStars:Number(id)}});returnres.status(204).send();",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "if(errinstanceofError){returnres.status(500).json({message:err.message});}returnres.status(500).json({message:Errodesconhecido.});",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/log/log-page": {
       "get": {
         "description": "",
         "parameters": [
           {
-            "name": "tipo",
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "search",
             "in": "query",
             "type": "string"
           }
@@ -386,11 +491,273 @@
           "200": {
             "description": "OK"
           },
-          "400": {
-            "description": "Bad Request"
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/triagem/triagem": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "respostas": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/triagem/triagem/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "Endpoint para login de usuários.",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "ignore": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Credenciais de acesso",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "usuario@exemplo.com"
+                },
+                "password": {
+                  "type": "string",
+                  "example": "123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/fila/fila": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusFila": {
+                  "example": "any"
+                },
+                "urgencia": {
+                  "example": "any"
+                },
+                "triagem": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/fila/fila/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/session/pareamento": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/agenda/agenda": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "limiteAtendimento": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/agenda/agenda/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }

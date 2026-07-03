@@ -1,28 +1,47 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "../../generated/prisma";
-import {createLog} from "../../../utils/fcuntion.log"
+import { prisma } from "../../../lib/prisma.js";
+import {createLog} from "../../../utils/fcuntion.log.js"
+import { BadRequest, Conflict, NotFound } from "../../error-handler/api-error.js";
+import client from "../../provider/redisConfig.js";
+import { triagemSchema } from "./types/triagem.zod.js";
+import { iovariable } from "../../index.js";
 
-const prisma = new PrismaClient();
+
 
 export const createTriagem = async (
   req: Request,
   res: Response
 ): Promise<any> => {
   try {
-    const { userId, respostas } = req.body;
+    const { id } = req.user;
+    const { respostas } = req.body;
+    
+    if (Object.keys(respostas).length === 0){
+      throw new BadRequest("Nenhuma resposta foi enviada, responda ao menos uma pergunta do questionário para ser atendido.");
 
-    if (!userId || typeof respostas !== "object") {
-      return res.status(400).json({ message: "Dados inválidos." });
     }
+    triagemSchema.parse(respostas)
 
-    const ifExistsId=await prisma.user.findFirst({
+    const DoesPacientExists = await prisma.paciente.findUnique({
       where: {
-        id:userId
-      }
-    })
-     if (!ifExistsId) {
-       return res.status(400).json({ message: "Este user não existe." });
-     }
+        user_id: id,
+      },
+    });
+    if (!DoesPacientExists) throw new NotFound("Este paciente não existe.");
+
+    const DoesTriageExists = await prisma.triagem.findFirst({
+      where: { paciente_id: id },
+    });
+
+    if (DoesTriageExists)
+      throw new Conflict("Já existe uma triagem associada a este paciente!");
+
+    const DoesFilaExists = await prisma.fila.findFirst({
+      where: { paciente_id: id },
+    });
+
+    if (DoesFilaExists)
+      throw new Conflict("O paciente já foi incluído na fila!");
 
     const pesos: Record<string, number> = {
       tristeza: 2,
@@ -36,7 +55,6 @@ export const createTriagem = async (
       pensamentosSuicidas: 10,
     };
 
-    // Calcular score
     let score = 0;
     for (const id in respostas) {
       if (respostas[id] === "sim") {
@@ -44,26 +62,53 @@ export const createTriagem = async (
       }
     }
 
-    // Classificação com base no score
-    let urgencia: "leve" | "média" | "alta" = "leve";
-    if (score >= 15) urgencia = "alta";
-    else if (score >= 6) urgencia = "média";
+    let urgencia: 0 | 1 | 2 = 0;
+    if (score >= 15) urgencia = 2;
+    else if (score >= 6) urgencia = 1;
 
-    // Salvar no banco de dados
-    const triagemCriada = await prisma.triagem.create({
-      data: {
-        userId,
-        respostas: JSON.stringify(respostas),
-        score,
-        urgencia,
-      },
+    const registros = await prisma.$transaction(async (tx) => {
+      // 1. Criar triagem
+      const triagem = await tx.triagem.create({
+        data: {
+          paciente_id: id,
+          respostas: JSON.stringify(respostas),
+          score,
+          urgencia,
+        },
+      });
+
+      const fila = await tx.fila.create({
+        data: {
+          paciente_id: id,
+          urgencia,
+          triagem_id: triagem.id,
+          statusFila: 2,
+        },
+      });
+
+      createLog("Foi feita uma triagem.", 2, id);
+      createLog("Um usuário foi adicionado à lista.", 6, id);
+
+      return { triagem, fila };
     });
-    
-    createLog("Foi feita uma triagem.", "inicio_triagem", userId );
 
+    await client.zAdd(
+      "fila_espera",
+      [{ score: Date.now(), value: id.toString() }],
+      { NX: true },
+    );
+
+    // --- Broadcast ---
+    iovariable.emit("fila_atualizada", {
+      user_id:id,
+      message:"Novo user na lista de espera",
+      // usuarioId: result.triagem.id,
+      // posicao: posicaoAtualUser !== null ? posicaoAtualUser + 1 : 1,
+      // totalNaFila,
+    });
     return res.status(201).json({
-      message: "Triagem registrada com sucesso.",
-      triagem: triagemCriada,
+      message: "Dados registrados com sucesso.",
+      registros,
     });
   } catch (err: unknown) {
     if (err instanceof Error) {

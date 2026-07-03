@@ -1,109 +1,96 @@
-import {Request, Response} from "express";
-import { PrismaClient } from "../generated/prisma";
-import { createLog } from "../../utils/fcuntion.log";
+import { Request, Response } from "express";
+import { PrismaClient } from "@prisma/client";
+import { createLog } from "../../utils/fcuntion.log.js";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
+
+import {
+  logarPsicologo,
+  deslogarPsicologo,
+} from "../../utils/function.udateStatus_psic.js";
+import { ApiError, BadRequest, NotFound } from "../error-handler/api-error.js";
+import { createHash } from "crypto";
+import { refresh_token } from "../provider/refresh_token_generate.js";
+import { userLoginSchema } from "./types/triagem.zod.js";
 dotenv.config();
 
 const prisma = new PrismaClient();
 
-export const loginPaciente = async function(req:Request, res:Response):Promise<any>{
-    const {email, password}=req.body
+export const loginUser = async function (
+  req: Request,
+  res: Response,
+): Promise<any> {
+  const { email, password } = req.body;
+  const userAgent = req.get("User-Agent") || "unknown-agent";
+  const ip = req.ip || "unknown-ip";
+  const deviceId = `${userAgent}-${ip}`;
 
-    try {
-      const ifEmailExists = await prisma.paciente.findUnique({
-        where: { email }
-      });
-      if (!ifEmailExists) {
-        return res.status(404).json({ message: "this user does not exist" });
-      }
-
-      if (ifEmailExists.password !== password) {
-        return res.status(404).json({ message: "this user does not exist" });
-      }
-
-      const createToken = jsonwebtoken.sign(
-        ifEmailExists,
-        process.env.SCT as string,
-        {expiresIn: "30min"}
-      );
-      await createLog("Usuário logado", "login", ifEmailExists.pacId);
-      return res.status(200).json({ token: createToken, user: ifEmailExists });
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        return res.status(500).json({ message: err.message });
-      }
-      return res.status(500).json({ message: "Erro desconhecido." });
-    }
-
-}
-export const loginPsicologo = async function(req:Request, res:Response):Promise<any>{
-    const {email, password}=req.body
-
-    try {
-      const ifEmailExists = await prisma.psicologo.findUnique({
-        where: { email }
-      });
-      if (!ifEmailExists) {
-        return res.status(404).json({ message: "this user does not exist" });
-      }
-
-      if (ifEmailExists.password !== password) {
-        return res.status(404).json({ message: "this user does not exist" });
-      }
-
-      const createToken = jsonwebtoken.sign(
-        ifEmailExists,
-        process.env.SCT as string,
-        {expiresIn: "30min"}
-      );
-      await createLog("Usuário logado", "login", ifEmailExists.psycId);
-
-      const agenda=await prisma.agenda_psicologo.findUnique({
-        where: { psicologoId: ifEmailExists.psycId },
-      });
-
-       if (!agenda) {
-         return res.status(404).json({ message: "Agenda não encontrada." });
-       }
-
-       await prisma.agenda_psicologo.update({
-         where: { psicologoId: ifEmailExists.psycId},
-         data: { isLogged: false },
-       });
-
-      return res.status(200).json({ token: createToken, user:ifEmailExists });
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        return res.status(500).json({ message: err.message });
-      }
-      return res.status(500).json({ message: "Erro desconhecido." });
-    }
-
-}
-
-
-export const logoutPsicologo = async (req: Request, res: Response) => {
+    userLoginSchema.parse(req.body)
   try {
-    const { psycId } = req.params;
-
-    const agenda = await prisma.agenda_psicologo.findUnique({
-      where: { psicologoId: Number(psycId)},
+  
+    const doesUserExists = await prisma.user.findUnique({
+      where: { email },
     });
-
-    if (!agenda) {
-      return res.status(404).json({ message: "Agenda não encontrada." });
+    if (!doesUserExists) {
+      throw new BadRequest("O e-mail ou a senha está incorreto.");
     }
 
-   
-    await prisma.agenda_psicologo.update({
-      where: { psicologoId: Number(psycId) },
-      data: { isLogged: false },
+    const senhaDigitadaHash = createHash("sha256")
+      .update(password)
+      .digest("hex");
+
+    if (doesUserExists.password !== senhaDigitadaHash) {
+      throw new BadRequest("O e-mail ou a senha está incorreto.");
+    }
+
+    const token = jsonwebtoken.sign(
+      { id: doesUserExists.id, role: doesUserExists.role, nome: doesUserExists.nome },
+      process.env.SCT as string,
+      { expiresIn: "8m" },
+    );
+
+    const refreshToken = await refresh_token(doesUserExists.id, ip, deviceId);
+
+    await createLog("Usuário logado", 1, doesUserExists.id);
+
+    const user = {
+      id: doesUserExists.id,
+      role: doesUserExists.role,
+      nome: doesUserExists.nome,
+      sobrenome: doesUserExists.sobrenome,
+      email: doesUserExists.email,
+      photo:doesUserExists.photo,
+    };
+
+    return res.status(200).json({ user, token, refreshToken });
+  } catch (err: unknown) {
+    if (err instanceof ApiError) {
+      return res.status(err.status).json({ message: err.message });
+    }
+    console.error(err);
+    res.status(500).json({ message: "Erro desconhecido." });
+  }
+};
+
+export const logoutUser = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { id, role } = req.user;
+
+    const isPsichologist = role === 1 ? { psicologo: true } : undefined;
+
+    const user = await prisma.user.findUnique({
+      where: { id:id },
+      include: isPsichologist,
     });
-    await createLog("Usuário deslogado", "logout", agenda.psicologoId);
+
+    if (!user) {
+      throw new NotFound("User não encontrado.");
+    }
+
+    // await deslogarPsicologo(user);
+    await createLog("Usuário deslogado", 11, user.id);
     return res.status(200).json({ message: "Logout realizado com sucesso." });
-  } 
-  catch (error) {
+  } catch (error) {
     console.error("Erro no logout:", error);
     return res.status(500).json({ message: "Erro ao realizar logout." });
   }

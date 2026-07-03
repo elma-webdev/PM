@@ -1,15 +1,14 @@
 // src/controller/avaliacao.controller.ts
 import { Request, Response } from "express";
-import { PrismaClient } from "../../generated/prisma";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../../lib/prisma";
 
 
 export async function createAvaliacao(req: Request, res: Response): Promise<any> {
   try {
-    const { sms, userId, psicologoId } = req.body;
+    const {id}=req.user
+    const { sms, psicologoId } = req.body;
     const avaliacao = await prisma.avaliacao.create({
-      data: { sms, userId, psicologoId },
+      data: { sms, pacienteAvaliacao: id, psicologoAvaliacao: psicologoId },
     });
     return res.status(201).json(avaliacao);
   } catch (err: unknown) {
@@ -58,24 +57,17 @@ export async function getAvaliacaoById(req: Request, res: Response): Promise<any
     const { id } = req.params;
     const avaliacao = await prisma.avaliacao.findUnique({
       where: { idStars: Number(id) },
-      include: {
-        User: {
-          select: {
-            paciente: {
-              select: {
-                email: true,
-                nome: true,
-              },
-            },
-          },
-        },
-        psicologo: {
-          select: {
-            email: true,
-            nome: true,
-          },
-        },
-      },
+      select: {
+        sms: true,
+        paciente:{
+          select:{
+            email:true,
+            nome:true,
+            photo:true,
+            sobrenome:true
+          }
+        }
+      }
     });
     if (!avaliacao) {
       return res.status(404).json({ message: "Avaliação não encontrada" });

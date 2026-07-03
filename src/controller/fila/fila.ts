@@ -1,75 +1,55 @@
 import { createLog } from "../../../utils/fcuntion.log";
-import { PrismaClient } from "../../generated/prisma";
+import { BadRequest, NotFound } from "../../error-handler/api-error";
+import { prisma } from "../../../lib/prisma";
 import { Request, Response } from "express";
-const prisma = new PrismaClient();
-
+import client from "../../provider/redisConfig";
+import { iovariable } from "../..";
 export const createFila = async (req: Request, res: Response): Promise<any> => {
-
-    try {
-      const { statusFila, urgencia, triagem } = req.body;
-
-       if (!triagem) {
-         return res.status(400).json({ message: "Dados inválidos." });
-       }
-
-       const ifExistsId = await prisma.triagem.findFirst({
-         where: {
-           id: Number(triagem),
-         },
-       });
-       if (!ifExistsId) {
-         return res.status(400).json({ message: "Esta triagem não existe." });
-       }
-
-
-      const triagemStatus = ifExistsId?.urgencia;
-  
-      const fila = await prisma.fila.create({
-        data: { statusFila, triagem, urgencia:triagemStatus },
-        select: {
-          entrada: true,
-          filaId: true,
-          urgencia: true,
-          statusFila: true,
-          triagem_id: {
-            select: {
-              user: {
-                select: {
-                  id: true,
-                  paciente: {
-                    select: {
-                      email: true,
-                      photo: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
-      });
-      const id=fila.triagem_id.user.id;
-      createLog("Um usuario entrou na fila", "mensagem",id);
-      return res.status(201).json(fila);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        return res.status(500).json({ message: err.message });
-      }
-      return res.status(500).json({ message: "Erro desconhecido." });
-    }
-
-    
 
 };
 export const getFila = async (req: Request, res: Response): Promise<any> => {
-
     try {
-      const fila = await prisma.fila.findMany();
-      return res.json(fila);
+      const totalNaFila = await client.zRange("fila_espera", 0, -1);
+
+      return res.json({ total: totalNaFila });
     } catch (err: unknown) {
       if (err instanceof Error) {
         return res.status(500).json({ message: err.message });
       }
       return res.status(500).json({ message: "Erro desconhecido." });
     }
+};
+
+export const getMyposition = async (req: Request, res: Response): Promise<any> => {
+  const { id } = req.user;
+
+  try {
+    // 2. Buscamos o rank (índice baseado em 0) do usuário no Sorted Set do Redis
+    const rank = await client.zRank("fila_espera", id.toString()) ;
+
+    if (rank === null) throw new NotFound("Você não está na fila de espera ativa no momento. ");
+      
+    console.log(rank, id)
+    // 4. Buscamos a quantidade total de elementos presentes na estrutura do Redis
+    const totalNaFila = await client.zCard("fila_espera");
+
+    // 5. Calculamos a posição real (humanizada, começando de 1)
+    const posicaoReal = rank + 1;
+
+    // 6. Retornamos a resposta ultrarrápida
+    return res.status(200).json({
+      usuarioId: id,
+      posicao: posicaoReal,
+      totalNaFila: totalNaFila,
+      tempoEstimadoMinutos: posicaoReal * 5, // Opcional: ex, 5 minutos por pessoa
+    });
+  } catch (err: unknown) {
+    console.error("Erro ao buscar posição na fila do Redis:", err);
+    if (err instanceof Error) {
+      return res.status(500).json({ message: err.message });
+    }
+    return res
+      .status(500)
+      .json({ message: "Erro interno ao processar a fila." });
+  }
 };

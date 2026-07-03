@@ -1,151 +1,165 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model Agenda_psicologo {
-  id                     Int                          @id @default(autoincrement())
-  status_disponibilidade Boolean?
-  isLogged               Boolean?
-  atendimento            Atendimento @default(video)
-  limiteAtendimento      Int
-  psicologoId            Int                          @unique(map: "psicologoId")
-  psicologo              Psicologo                    @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, map: "atendimento_ibfk_1")
+  agenda_id              String    @id @default(uuid())
+  status_disponibilidade Int?      @map("status_disponibilidade")
+  isLogged               Int?      @map("is_logged")
+  limiteAtendimento      Int       @map("limite_atendimento")
+  psicologo_id           String    @unique(map: "psicologo_agenda") @map("psicologo_id")
+  psicologo              Psicologo @relation("relacao_agenda", fields: [psicologo_id], references: [user_id], onDelete: Cascade)
+
+  @@map("agendas")
 }
 
 model Avaliacao {
-  idStars     Int       @id @default(autoincrement())
-  sms         String    @db.VarChar(255)
-  userId      Int
-  psicologoId Int
-  psicologo   Psicologo @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, map: "Avaliacao_psicologoId_fkey")
-  User        User      @relation(fields: [userId], references: [id], onDelete: NoAction, map: "stars_ibfk_1")
+  star_id      String    @id @default(uuid())
+  observacao   String    @db.VarChar(255)
+  psicologo_id String    @map("psicologo_id")
+  paciente_id  String    @map("paciente_id")
+  paciente     Paciente  @relation("Avaliacao_feita", fields: [paciente_id], references: [user_id], onDelete: Cascade)
+  psicologo    Psicologo @relation("Avaliacao_recebida", fields: [psicologo_id], references: [user_id], onDelete: Cascade)
 
-  @@index([psicologoId], map: "Avaliacao_psicologoId_fkey")
-  @@index([userId], map: "stars_ibfk_1")
+  @@map("avaliacoes")
 }
 
 model Fila {
-  filaId                        Int             @id @default(autoincrement())
-  statusFila                    fila_statusFila
-  entrada                       DateTime        @default(now())
-  urgencia                      String
-  triagem                       Int             @unique(map: "triagem")
-  triagem_id  Triagem     @relation(fields: [triagem], references: [id], onDelete: NoAction, map: "fila_ibfk_1")
+  fila_id     String   @id @default(uuid())
+  statusFila  Int      @map("status_fila")
+  entrada     DateTime @default(now())
+  urgencia    Int
+  triagem_id  String   @unique(map: "triagem")
+  paciente_id String   @unique(map: "paciente")
+  paciente    Paciente @relation(fields: [paciente_id], references: [user_id])
+  triagem     Triagem  @relation(fields: [triagem_id], references: [id])
+
+  @@map("filas")
 }
 
 model Logatividade {
-  id        Int               @id @default(autoincrement())
-  usuarioId Int
-  tipo      TipoLog
-  mensagem  String
-  data      DateTime          @default(now())
+  log_id   Int      @id @default(autoincrement())
+  user_id  String
+  tipo     Int
+  mensagem String
+  data     DateTime @default(now())
+
+  @@map("logs")
 }
 
 model Paciente {
-  pacId     Int      @id @default(autoincrement())
-  nome      String   @db.VarChar(255)
+  user_id   String      @id @map("user_id")
   idade     Decimal?
-  password  String
-  photo     String?
-  email     String   @unique(map: "email") @db.VarChar(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @default(now())
   telefone  String?
-  userId    Int      @unique(map: "userId")
-  user      User     @relation(fields: [userId], references: [id], onDelete: NoAction, map: "Pacientes_ibfk_1")
+  avaliacao Avaliacao[] @relation("Avaliacao_feita")
+  fila      Fila?
+  user      User        @relation(fields: [user_id], references: [id])
+  sessao    Sessao[]    @relation("SessoesPacientes")
+  triagem   Triagem?
+
+  @@map("pacientes")
 }
-// >> field: e o campo de fk, references>> eh o nome do campo de pk original
 
 model Psicologo {
-  psycId           Int               @id @default(autoincrement())
-  nome             String?           @db.VarChar(255)
-  password         String
-  photo            String?
-  email            String            @unique(map: "email") @db.VarChar(255)
-  bio              String?           @db.VarChar(500)
-  createdAt        DateTime          @default(now())
-  updatedAt DateTime @default(now())
-  role             Role    @default(PSICOLOGO)
-  agenda_psicologo Agenda_psicologo?
-  avaliacao        Avaliacao[]
-  sessao           Sessao[]
+  user_id       String            @id @map("user_id")
+  bio           String?           @db.VarChar(500)
+  createdAt     DateTime          @default(now())
+  numero_ordem  String            @unique
+  especialidade String?           @db.VarChar(255)
+  updatedAt     DateTime          @default(now())
+  status        Int               @default(2)
+  agenda        Agenda_psicologo? @relation("relacao_agenda")
+  avalicao      Avaliacao[]       @relation("Avaliacao_recebida")
+  posts         Post[]
+  user          User              @relation(fields: [user_id], references: [id])
+  sessoes       Sessao[]          @relation("SessoesPsicologos")
+
+  @@map("psicologos")
 }
 
 model Sessao {
-  sessaoId    Int            @id @default(autoincrement())
-  status      sessao_status?
-  inicio      DateTime       @default(now())
-  fim         DateTime?
-  userId      Int
-  psicologoId Int
-  psicologo   Psicologo      @relation(fields: [psicologoId], references: [psycId], onDelete: NoAction, map: "Sessao_psicologoId_fkey")
-  user        User           @relation(fields: [userId], references: [id], onDelete: NoAction, map: "sessao_ibfk_1")
+  sessao_id    String    @id @default(uuid())
+  status       Int       @default(0)
+  inicio       DateTime  @default(now())
+  fim          DateTime?
+  psicologo_id String
+  paciente_id  String
+  paciente     Paciente  @relation("SessoesPacientes", fields: [paciente_id], references: [user_id])
+  psicologo    Psicologo @relation("SessoesPsicologos", fields: [psicologo_id], references: [user_id])
 
-  @@index([psicologoId], map: "Sessao_psicologoId_fkey")
-  @@index([userId], map: "sessao_ibfk_1")
+  @@map("sessoes")
 }
 
 model Triagem {
-  id                         Int      @id @default(autoincrement())
-  score                      Int
-  userId                     Int      @unique(map: "userId")
-  urgencia                   String
-  respostas                  String
-  createdAt                  DateTime @default(now())
-  fila Fila?  
-  user                       User     @relation(fields: [userId], references: [id], onDelete: NoAction, map: "userT_ibfk_1")
+  id          String   @id @default(uuid())
+  score       Int
+  urgencia    Int      @default(0)
+  respostas   String
+  createdAt   DateTime @default(now())
+  paciente_id String   @unique
+  fila        Fila?
+  paciente    Paciente @relation(fields: [paciente_id], references: [user_id])
+
+  @@map("triagens")
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  isAnonimo Boolean     @default(false)
-  role      Role   @default(PACIENTE)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime @default(now())
-  avaliacao Avaliacao[]
-  paciente  Paciente?
-  sessao    Sessao[]
-  triagem   Triagem?
+  id                 String              @id @default(uuid())
+  nome               String              @db.VarChar(255)
+  sobrenome          String              @db.VarChar(255)
+  password           String
+  photo              String?
+  email              String              @unique(map: "email") @db.VarChar(255)
+  role               Int
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @default(now())
+  refreshToken       RefreshToken[]
+  paciente           Paciente?
+  passwordResetCodes PasswordResetCode[]
+  psicologo          Psicologo?
+
+  @@map("users")
 }
 
-enum sessao_status {
-  ativa
-  finalizada
+model PasswordResetCode {
+  pass_id   String   @id @default(uuid())
+  code      String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user_id   String
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([code])
+  @@map("password_codes")
 }
 
-enum fila_statusFila {
-  na_fila
-  em_atendimento
-  atendido
-  removido
-  classificacao
+model Post {
+  post_id      String     @id @default(uuid())
+  psicologo_id String?
+  content      String
+  photoUrl     String?
+  likes        Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  hastags      String
+  psicologo    Psicologo? @relation(fields: [psicologo_id], references: [user_id])
+
+  @@map("posts")
 }
 
-enum  TipoLog {
-  login
-  logout
-  inicio_triagem
-  conclusao_triagem
-  inicio_sessao
-  fim_sessao
-  create_account
-  mensagem
-  erro
-}
-
-
-enum Atendimento {
-  video
-  chat
-}
-
-enum Role {
-  PACIENTE
-  PSICOLOGO
+model RefreshToken {
+  token_id   String @id @default(uuid())
+  expiresIn  Int
+  refresh    String
+  user_id    String
+  user_agent String
+  ip         String
+  user       User   @relation(fields: [user_id], references: [id])
 }
