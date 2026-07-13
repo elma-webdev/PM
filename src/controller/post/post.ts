@@ -1,4 +1,3 @@
-// import { ApiError } from "../../error-handler/api-error.t";
 import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
 import { postSchema } from "./types/types.zod.js";

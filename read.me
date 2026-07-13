@@ -1,129 +1,36 @@
-endpoint:localhost:3000/api
+1. Snapshot e Renderização
+Entender que cada renderização é uma "fotografia" estática no tempo.
 
-rotas publicas:
-* modo anonimo:
-/users/user
+State as a Snapshot: Como as props e estados permanecem constantes dentro de uma única execução da função.
 
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-rota de usuarios
-/users
+Re-render Logic: O que exatamente faz o React decidir pintar a tela de novo? (Mudança de props, state ou context).
 
-* criar paciente
-/create-paciente
+2. Closures e o "Stale State"
+Este é um tópico de JavaScript Puro que assombra muitos devs React.
 
-* ver pacientes
-/get-paciente
+Stale Closures (Clausuras obsoletas): Quando uma função "lembra" de uma variável de uma renderização antiga e usa o valor desatualizado.
 
-*ver um paciente:
-/get-paciente/:id
+Lexical Scope: Como as funções capturam variáveis ao seu redor.
 
-* criar psicologo
-/create-psyc
+3. Gerenciamento de Estado Avançado
+Functional Updates: Aprender a usar setCount(prev => prev + 1) em vez de setCount(count + 1). Isso resolve 90% dos problemas de estados que não atualizam como esperado.
 
-* ver pscilogo
-/get-psyc
+Automatic Batching (React 18+): Como o React agrupa atualizações mesmo dentro de chamadas assíncronas (Promises, async/await).
 
-*ver um psicologo:
-/get-psyc/:id
+4. O Ciclo de Vida com Hooks (useEffect)
+Esqueça os antigos componentDidMount. O segredo está em entender a Sincronização.
 
->>>>>>>>>>>>>>>>>
-rota de avaliacoes
-/rate
+Synchronization, not Lifecycle: O useEffect não é para rodar código "no início", mas para sincronizar o estado do seu componente com um sistema externo (API, LocalStorage, etc).
 
->>>>>>>>>>>>>>>>>>>>>>
-rota de logs
-/log
+Dependency Array: Por que esquecer uma variável aqui causa bugs de estado atrasado.
 
+Cleanup Function: Como limpar eventos e evitar vazamentos de memória (memory leaks).
 
-import { useState } from "react";
+5. Imutabilidade no JavaScript
+Como você está lidando com arrays (posts), este tópico é vital.
 
-const perguntasTriagem = [
-  { id: "tristeza", texto: "Você tem se sentido muito triste ou desanimado(a)?" },
-  { id: "ansiedade", texto: "Você tem sentido ansiedade, medo ou preocupação frequentes?" },
-  { id: "irritabilidade", texto: "Você tem se irritado com facilidade ultimamente?" },
-  { id: "sono", texto: "Você tem tido dificuldades para dormir ou dormir demais?" },
-  { id: "apetite", texto: "Seu apetite mudou significativamente nos últimos dias?" },
-  { id: "isolamento", texto: "Você tem evitado sair ou conversar com as pessoas?" },
-  { id: "criseAtual", texto: "Você está passando por alguma crise emocional neste momento?" },
-  { id: "automutilacao", texto: "Você já se machucou intencionalmente ou sentiu vontade de se machucar?" },
-  { id: "pensamentosSuicidas", texto: "Você tem pensado em acabar com a própria vida?" },
-];
+Referential Equality (Igualdade Referencial): Entender que [] === [] é false e por que o React só atualiza a tela se você criar um novo objeto/array (usando o Spread Operator [...]).
 
-//Record eh um tipo nativo do TS, onde o primeiro valor eh a chave e o segundo a chave, tb podia ser Record<string, number|boolean>... eh muito util quando os tipos sao ja bem definidos, tb podiamos usar um type{
-  //tristeza:int,
-  //ansiedade:int,
-//}, mas nota que eh repeticao...
-
-const pesos: Record<string, number> = {
-  tristeza: 2,
-  ansiedade: 2,
-  irritabilidade: 1,
-  sono: 1,
-  apetite: 1,
-  isolamento: 1,
-  criseAtual: 5,
-  automutilacao: 8,
-  pensamentosSuicidas: 10,
-};
-
-export default function TriagemSimples() {
-  const [respostas, setRespostas] = useState<Record<string, string>>({});
-  const [classificacao, setClassificacao] = useState("");
-
-  //respostas eh do tipo const respostas = {
- // tristeza: "sim",
- // ansiedade: "não"};
-
-  function handleResposta(id: string, valor: string) {
-    setRespostas(prev => ({ ...prev, [id]: valor }));
-  }
-
-  function calcularClassificacao() {
-    let score = 0;
-
-    //Não faria sentido usar respostas.id, porque isso tentaria acessar uma chave 
-    //literalmente chamada "id", e ela não existe. NEste caso acessamos os objectos 
-    //como um array associativo, ou seja, um objeto com chaves dinâmicas.
+Deep vs Shallow Copy: Por que alterar uma propriedade de um objeto dentro de um array às vezes não faz o componente atualizar.
 
 
-    for (const id in respostas) {
-      if (respostas[id] === "sim") {
-        score += pesos[id] || 0;
-      }
-    }
-
-    if (score >= 15) return "alta urgência";
-    if (score >= 6) return "urgência média";
-    return "urgência leve";
-  }
-
-  function handleEnviar() {
-    const resultado = calcularClassificacao();
-    setClassificacao(resultado);
-  }
-
-  return (
-    <div>
-      <h2>Triagem Inicial</h2>
-
-      {perguntasTriagem.map(pergunta => (
-        <div key={pergunta.id}>
-          <p>{pergunta.texto}</p>
-          <button onClick={() => handleResposta(pergunta.id, "sim")}>
-            Sim
-          </button>
-          <button onClick={() => handleResposta(pergunta.id, "não")}>
-            Não
-          </button>
-        </div>
-      ))}
-
-      <br />
-      <button onClick={handleEnviar}>Finalizar Triagem</button>
-
-      {classificacao && (
-        <p><strong>Classificação:</strong> {classificacao}</p>
-      )}
-     </div>
-  );
-}

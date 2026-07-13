@@ -1,5 +1,5 @@
-import { BadRequest } from "../../error-handler/api-error";
-import { prisma } from "../../../lib/prisma";
+import { BadRequest } from "../../error-handler/api-error.js";
+import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
 
 

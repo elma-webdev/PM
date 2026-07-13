@@ -1,9 +1,9 @@
-import { createLog } from "../../../utils/fcuntion.log";
-import { BadRequest, NotFound } from "../../error-handler/api-error";
-import { prisma } from "../../../lib/prisma";
+import { createLog } from "../../../utils/fcuntion.log.js";
+import { BadRequest, NotFound } from "../../error-handler/api-error.js";
+import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
-import client from "../../provider/redisConfig";
-import { iovariable } from "../..";
+import client from "../../provider/redisConfig.js";
+// import { iovariable } from "../..";
 export const createFila = async (req: Request, res: Response): Promise<any> => {
 
 };

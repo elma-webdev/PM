@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 export const triagemSchema=z.object({
-    respostas:z.object({
+
         tristeza:z.enum(["sim","nao"],{message:"A resposta deve ser 'sim' ou 'nao'"}).optional(),
         ansiedade:z.enum(["sim","nao"],{message:"A resposta deve ser 'sim' ou 'nao'"}).optional(),
         irritabilidade:z.enum(["sim","nao"],{message:"A resposta deve ser 'sim' ou 'nao'"}).optional(),
@@ -13,4 +13,3 @@ export const triagemSchema=z.object({
         pensamentosSuicidas:z.enum(["sim","nao"],{message:"A resposta deve ser 'sim' ou 'nao'"}).optional()
     })
 
-})

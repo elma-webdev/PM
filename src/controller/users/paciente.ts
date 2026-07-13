@@ -10,28 +10,33 @@ export async function createPaciente(
   req: Request,
   res: Response,
 ): Promise<any> {
-  const {idade, telefone, nome, email, password, sobrenome,photo} = req.body;
-
-  patientSchema.parse(req.body);
-
+  
   try {
+    const parsed = patientSchema.safeParse(req.body);
+     if (!parsed.success) {
+      throw parsed.error;
+    }
+    const {idade, telefone, user} = parsed.data;
+    const { nome, email, password, sobrenome } = user;
   const doesUserExist = await prisma.user.findFirst({
     where: {
       email:email
     }
   });
+  console.log("doesUserExist:", doesUserExist);
+
 
   if (doesUserExist) {
-    throw new Conflict("Email já cadastrado no sistema.");
+    throw new Conflict("Usuário já cadastrado no sistema.");
   }
+
+   const file: any = req.file;
+   let image = null;
+   if (file) {
+     image = await uploadToSupabase(file);
+   }
 
   const hashPassword = createHash("sha256").update(password).digest("hex");
-
-  const file:any = req.file;
-  let image = null;
-  if (file) {
-    image= await uploadToSupabase(file);
-  }
 
   
     const paciente = await prisma.paciente.create({

@@ -1,6 +1,6 @@
 // src/controller/avaliacao.controller.ts
 import { Request, Response } from "express";
-import { prisma } from "../../../lib/prisma";
+import { prisma } from "../../../lib/prisma.js";
 
 
 export async function createAvaliacao(req: Request, res: Response): Promise<any> {

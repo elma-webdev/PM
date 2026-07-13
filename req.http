@@ -1,0 +1,129 @@
+### Variables 
+@apiurl = http://localhost:3000/api/
+
+
+###
+
+POST http://localhost:3000/api/forgot-password
+Content-Type: application/json
+# Authorization: Bearer ACCESS-TOKEN
+
+{
+    "email": "juelma@gmail.com"
+}
+###
+POST http://localhost:3000/api/reset-password
+Content-Type: application/json
+# Authorization: Bearer ACCESS-TOKEN
+
+{
+    "email": "juelma@gmail.com",
+    "code":"2966",
+    "newPassword":"admin123"
+}
+
+###
+GET http://localhost:3000/api/psicologo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRmNjFlNTM4LTE4ZmItNDhiYi1hMmFlLTMzNTE3MDQwMjg1NiIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4Mjg2MjIwNywiZXhwIjoxNzgyODYyNjg3fQ.w4-2y8z9IvyOwdpy5VSUIm1TlESJrKfowbONUWc9NwY
+
+###
+POST http://localhost:3000/api/admin
+Content-Type: application/json
+
+{
+    "email": "teste@example.com",
+    "password": "Teste123_",
+    "role": 2,
+    "nome": "John",
+    "sobrenome": "Mark Doe"
+}
+###
+GET http://localhost:3000/api/dashboard/users
+
+
+###
+GET http://localhost:3000/api/psicologo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRmNjFlNTM4LTE4ZmItNDhiYi1hMmFlLTMzNTE3MDQwMjg1NiIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4Mjg2OTY2NSwiZXhwIjoxNzgyODcwMTQ1fQ.ysAJ5DY0CCpGfe3iA6SQb2c436fbgmjsc5Gf_VNxcgQ
+
+###
+POST http://localhost:3000/api/psicologo
+Content-Type: application/json
+
+{
+  "especialidade": "Psicologia clínica",
+  "numero_ordem": "37647387",
+  "user": {
+      "email": "luana@example.com",
+      "password": "User123_",
+      "role": 0,
+      "nome": "Luana",
+      "sobrenome": "Cabeche"
+  }
+}
+
+###
+
+POST http://localhost:3000/api/paciente
+Content-Type: application/json
+
+{
+  "telefone": "940019234",
+  "idade":25,
+  "user": {
+      "email": "anaww@example.com",
+      "password": "AnaLima123_",
+      "role": 0,
+      "nome": "Ana Silva",
+      "sobrenome": "Lima"
+  }
+}
+
+###
+
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+    "email":"aurora@example.com",
+    "password":"Aurora123_"
+}
+
+
+### post
+POST http://localhost:3000/api/posts
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRmNjFlNTM4LTE4ZmItNDhiYi1hMmFlLTMzNTE3MDQwMjg1NiIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4Mjg1NzY0OSwiZXhwIjoxNzgyODU4MTI5fQ.YEebn6AqPpcCktcO7hEb2w_6-ZZHGTzEPEOU753CamM
+
+{
+    "content":"Perdoe-se sempre", "hastags":"saude, bem-estar", "photoUrl":"foto de teste", "psicologo_id":"083392da-1e36-4d0c-854d-f15feab09665"
+}
+
+#### Refresh token
+
+POST http://localhost:3000/api/refresh
+Content-Type: application/json
+
+{
+    "refresh":"a88d7720-fc03-4602-84f3-dcad913ed737"
+}
+
+###
+POST http://localhost:3000/api/paciente
+Content-Type: application/json
+
+{
+  "idade":24,
+  "telefone": "900123451",
+  "user": {
+      "email": "Anita@example.com",
+      "password": "User123_",
+      "role": 0,
+      "nome": "Anita",
+      "sobrenome": "Moniz"
+  }
+}
+###
+GET http://localhost:3000/api/agenda/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ1NmQ3OTVhLTVmZDktNDdkMy1hMGQxLTU5OTE4ODViZTIyYyIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4MjU2NTM2NiwiZXhwIjoxNzgyNTY1ODQ2fQ.W4BJeUlkxVIYN6LxXdQrFOvzu-k63ET2KJOKrzbFr-Q
+
+###

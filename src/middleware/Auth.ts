@@ -33,7 +33,7 @@ export const Auth = (req: Request, res: Response, next: NextFunction) => {
       return;
     }
 
-    const payload = decoded as { id: number, role: number};
+    const payload = decoded as { id: string, role: number};
 
     req.user = payload;
 

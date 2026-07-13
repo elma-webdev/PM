@@ -20,20 +20,32 @@ CREATE TABLE "avaliacoes" (
 );
 
 -- CreateTable
+CREATE TABLE "notificacoes" (
+    "not_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
+    "mensagem" TEXT NOT NULL,
+    "read" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "notificacoes_pkey" PRIMARY KEY ("not_id")
+);
+
+-- CreateTable
 CREATE TABLE "filas" (
     "fila_id" TEXT NOT NULL,
     "status_fila" INTEGER NOT NULL,
     "entrada" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "urgencia" INTEGER NOT NULL,
     "triagem_id" TEXT NOT NULL,
+    "paciente_id" TEXT NOT NULL,
 
     CONSTRAINT "filas_pkey" PRIMARY KEY ("fila_id")
 );
 
 -- CreateTable
 CREATE TABLE "logs" (
-    "log_id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
+    "log_id" TEXT NOT NULL,
+    "user_id" TEXT NOT NULL,
     "tipo" INTEGER NOT NULL,
     "mensagem" TEXT NOT NULL,
     "data" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -44,11 +56,10 @@ CREATE TABLE "logs" (
 -- CreateTable
 CREATE TABLE "pacientes" (
     "user_id" TEXT NOT NULL,
-    "idade" DECIMAL(65,30),
+    "idade" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "telefone" TEXT,
-    "triagem_feita" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "pacientes_pkey" PRIMARY KEY ("user_id")
 );
@@ -149,6 +160,9 @@ CREATE UNIQUE INDEX "psicologo_agenda" ON "agendas"("psicologo_id");
 CREATE UNIQUE INDEX "triagem" ON "filas"("triagem_id");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "paciente" ON "filas"("paciente_id");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "psicologos_numero_ordem_key" ON "psicologos"("numero_ordem");
 
 -- CreateIndex
@@ -164,10 +178,16 @@ CREATE INDEX "password_codes_code_idx" ON "password_codes"("code");
 ALTER TABLE "agendas" ADD CONSTRAINT "agendas_psicologo_id_fkey" FOREIGN KEY ("psicologo_id") REFERENCES "psicologos"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "avaliacoes" ADD CONSTRAINT "avaliacoes_paciente_id_fkey" FOREIGN KEY ("paciente_id") REFERENCES "pacientes"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "avaliacoes" ADD CONSTRAINT "avaliacoes_psicologo_id_fkey" FOREIGN KEY ("psicologo_id") REFERENCES "psicologos"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "avaliacoes" ADD CONSTRAINT "avaliacoes_paciente_id_fkey" FOREIGN KEY ("paciente_id") REFERENCES "pacientes"("user_id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "notificacoes" ADD CONSTRAINT "notificacoes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "filas" ADD CONSTRAINT "filas_paciente_id_fkey" FOREIGN KEY ("paciente_id") REFERENCES "pacientes"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "filas" ADD CONSTRAINT "filas_triagem_id_fkey" FOREIGN KEY ("triagem_id") REFERENCES "triagens"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -179,10 +199,10 @@ ALTER TABLE "pacientes" ADD CONSTRAINT "pacientes_user_id_fkey" FOREIGN KEY ("us
 ALTER TABLE "psicologos" ADD CONSTRAINT "psicologos_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "sessoes" ADD CONSTRAINT "sessoes_psicologo_id_fkey" FOREIGN KEY ("psicologo_id") REFERENCES "psicologos"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "sessoes" ADD CONSTRAINT "sessoes_paciente_id_fkey" FOREIGN KEY ("paciente_id") REFERENCES "pacientes"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "sessoes" ADD CONSTRAINT "sessoes_paciente_id_fkey" FOREIGN KEY ("paciente_id") REFERENCES "pacientes"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "sessoes" ADD CONSTRAINT "sessoes_psicologo_id_fkey" FOREIGN KEY ("psicologo_id") REFERENCES "psicologos"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "triagens" ADD CONSTRAINT "triagens_paciente_id_fkey" FOREIGN KEY ("paciente_id") REFERENCES "pacientes"("user_id") ON DELETE RESTRICT ON UPDATE CASCADE;

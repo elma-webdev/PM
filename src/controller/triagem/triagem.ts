@@ -14,14 +14,14 @@ export const createTriagem = async (
 ): Promise<any> => {
   try {
     const { id } = req.user;
-    const { respostas } = req.body;
-    
-    if (Object.keys(respostas).length === 0){
+
+    type Respostas = Record<string, "sim"|"nao">;
+    const respostas:Respostas = triagemSchema.parse(req.body);
+    console.log(respostas)
+      if (Object.keys(respostas).length === 0){
       throw new BadRequest("Nenhuma resposta foi enviada, responda ao menos uma pergunta do questionário para ser atendido.");
 
     }
-    triagemSchema.parse(respostas)
-
     const DoesPacientExists = await prisma.paciente.findUnique({
       where: {
         user_id: id,
@@ -56,11 +56,12 @@ export const createTriagem = async (
     };
 
     let score = 0;
-    for (const id in respostas) {
-      if (respostas[id] === "sim") {
-        score += pesos[id] || 0;
-      }
-    }
+   for (const id in respostas) {
+     if (respostas[id] === "sim") {
+       score += pesos[id] || 0;
+     }
+   }
+
 
     let urgencia: 0 | 1 | 2 = 0;
     if (score >= 15) urgencia = 2;
@@ -71,7 +72,7 @@ export const createTriagem = async (
       const triagem = await tx.triagem.create({
         data: {
           paciente_id: id,
-          respostas: JSON.stringify(respostas),
+          respostas:JSON.stringify(respostas),
           score,
           urgencia,
         },
@@ -87,7 +88,7 @@ export const createTriagem = async (
       });
 
       createLog("Foi feita uma triagem.", 2, id);
-      createLog("Um usuário foi adicionado à lista.", 6, id);
+      createLog("Um paciente foi adicionado à lista.", 6, id);
 
       return { triagem, fila };
     });
@@ -99,9 +100,9 @@ export const createTriagem = async (
     );
 
     // --- Broadcast ---
-    iovariable.emit("fila_atualizada", {
+    iovariable.emit("entrar_fila", {
       user_id:id,
-      message:"Novo user na lista de espera",
+      message:"Novo paciente na lista de espera",
       // usuarioId: result.triagem.id,
       // posicao: posicaoAtualUser !== null ? posicaoAtualUser + 1 : 1,
       // totalNaFila,

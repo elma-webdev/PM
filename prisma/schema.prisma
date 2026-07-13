@@ -29,6 +29,17 @@ model Avaliacao {
   @@map("avaliacoes")
 }
 
+model Notificacao {
+  not_id    String   @id @default(uuid())
+  user_id   String
+  mensagem  String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notificacoes")
+}
+
 model Fila {
   fila_id     String   @id @default(uuid())
   statusFila  Int      @map("status_fila")
@@ -43,7 +54,7 @@ model Fila {
 }
 
 model Logatividade {
-  log_id   Int      @id @default(autoincrement())
+  log_id   String   @id @default(uuid())
   user_id  String
   tipo     Int
   mensagem String
@@ -54,7 +65,7 @@ model Logatividade {
 
 model Paciente {
   user_id   String      @id @map("user_id")
-  idade     Decimal?
+  idade     Int?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @default(now())
   telefone  String?
@@ -121,6 +132,7 @@ model User {
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now())
   refreshToken       RefreshToken[]
+  notificacoes       Notificacao[]
   paciente           Paciente?
   passwordResetCodes PasswordResetCode[]
   psicologo          Psicologo?
