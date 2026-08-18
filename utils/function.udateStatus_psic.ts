@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 import { NextFunction, Request, Response } from "express";
 
 
@@ -11,7 +11,7 @@ export const logarPsicologo = async (
   if (role === 1) {
     try {
       await prisma.agenda_psicologo.update({
-        where: { psicologoAgenda: id },
+        where: { psicologo_id: id },
         data: { isLogged: 1 },
       });
     } catch (error) {
@@ -34,12 +34,12 @@ export const deslogarPsicologo = async (
   if (role === 1) {
     try {
       const psicologo = await prisma.psicologo.findUnique({
-        where: { userId: id },
+        where: {user_id:id},
       });
 
       if (psicologo) {
         await prisma.agenda_psicologo.update({
-          where: { psicologoAgenda: psicologo.psycId },
+          where: { psicologo_id: id},
           data: { isLogged: 0 },
         });
         console.log("Psicólogo deslogado");

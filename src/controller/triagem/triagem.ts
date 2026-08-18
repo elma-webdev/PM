@@ -33,15 +33,7 @@ export const createTriagem = async (
       where: { paciente_id: id },
     });
 
-    if (DoesTriageExists)
-      throw new Conflict("Já existe uma triagem associada a este paciente!");
-
-    const DoesFilaExists = await prisma.fila.findFirst({
-      where: { paciente_id: id },
-    });
-
-    if (DoesFilaExists)
-      throw new Conflict("O paciente já foi incluído na fila!");
+    if (DoesTriageExists) throw new Conflict("Já existe uma triagem associada a este paciente!");
 
     const pesos: Record<string, number> = {
       tristeza: 2,
@@ -67,9 +59,7 @@ export const createTriagem = async (
     if (score >= 15) urgencia = 2;
     else if (score >= 6) urgencia = 1;
 
-    const registros = await prisma.$transaction(async (tx) => {
-      // 1. Criar triagem
-      const triagem = await tx.triagem.create({
+     const triagem = await prisma.triagem.create({
         data: {
           paciente_id: id,
           respostas:JSON.stringify(respostas),
@@ -78,38 +68,10 @@ export const createTriagem = async (
         },
       });
 
-      const fila = await tx.fila.create({
-        data: {
-          paciente_id: id,
-          urgencia,
-          triagem_id: triagem.id,
-          statusFila: 2,
-        },
-      });
 
-      createLog("Foi feita uma triagem.", 2, id);
-      createLog("Um paciente foi adicionado à lista.", 6, id);
-
-      return { triagem, fila };
-    });
-
-    await client.zAdd(
-      "fila_espera",
-      [{ score: Date.now(), value: id.toString() }],
-      { NX: true },
-    );
-
-    // --- Broadcast ---
-    iovariable.emit("entrar_fila", {
-      user_id:id,
-      message:"Novo paciente na lista de espera",
-      // usuarioId: result.triagem.id,
-      // posicao: posicaoAtualUser !== null ? posicaoAtualUser + 1 : 1,
-      // totalNaFila,
-    });
     return res.status(201).json({
       message: "Dados registrados com sucesso.",
-      registros,
+      triagem
     });
   } catch (err: unknown) {
     if (err instanceof Error) {

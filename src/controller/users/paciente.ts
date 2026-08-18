@@ -4,41 +4,37 @@ import { createHash } from "node:crypto";
 import { uploadToSupabase } from "../../provider/supabase.file.js";
 import { Conflict } from "../../error-handler/api-error.js";
 import { patientSchema } from "./types/types.users.js";
-import { prisma } from '../../../lib/prisma.js';
+import { prisma } from "../../../lib/prisma.js";
 
 export async function createPaciente(
   req: Request,
   res: Response,
 ): Promise<any> {
-  
   try {
     const parsed = patientSchema.safeParse(req.body);
-     if (!parsed.success) {
+    if (!parsed.success) {
       throw parsed.error;
     }
-    const {idade, telefone, user} = parsed.data;
+    const { idade, telefone, user } = parsed.data;
     const { nome, email, password, sobrenome } = user;
-  const doesUserExist = await prisma.user.findFirst({
-    where: {
-      email:email
+    const doesUserExist = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    if (doesUserExist) {
+      throw new Conflict("Usuário já cadastrado no sistema.");
     }
-  });
-  console.log("doesUserExist:", doesUserExist);
 
+    const file: any = req.file;
+    let image = null;
+    if (file) {
+      image = await uploadToSupabase(file);
+    }
 
-  if (doesUserExist) {
-    throw new Conflict("Usuário já cadastrado no sistema.");
-  }
+    const hashPassword = createHash("sha256").update(password).digest("hex");
 
-   const file: any = req.file;
-   let image = null;
-   if (file) {
-     image = await uploadToSupabase(file);
-   }
-
-  const hashPassword = createHash("sha256").update(password).digest("hex");
-
-  
     const paciente = await prisma.paciente.create({
       data: {
         idade,
@@ -48,9 +44,9 @@ export async function createPaciente(
             email,
             nome,
             password: hashPassword,
-            photo:image,
+            photo: image,
             sobrenome,
-            role: 0, 
+            role: 0,
           },
         },
       },
@@ -138,4 +134,3 @@ export async function getPacientesById(
     return res.status(500).json({ message: "Erro desconhecido." });
   }
 }
-

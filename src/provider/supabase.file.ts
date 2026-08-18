@@ -21,7 +21,7 @@ export const uploadToSupabase = async (
     });
 
   if (error) {
-    console.error("Erro Supabase:", error.message);
+    console.error("Erro Supabase:", error);
     throw new Error("Falha no upload para o Supabase");
   }
 

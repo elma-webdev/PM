@@ -4,7 +4,7 @@ import { permissionBoth } from "../middleware/permission.js";
 import { Auth } from "../middleware/Auth.js";
 const agendaRouter=Router()
 
-agendaRouter.post("/agenda", createAgenda);
+agendaRouter.post("/agenda", Auth, createAgenda);
 agendaRouter.get('/agenda/', Auth,getAgenda)
 
 export {agendaRouter}

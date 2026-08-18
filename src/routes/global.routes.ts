@@ -10,6 +10,7 @@ import { sessionRouter } from "./session.route.js";
 import { postRouter } from "./post.routes.js";
 import { adminRouter } from "./admin.routes.js";
 import { psyRouter } from "./psicologos.routes.js";
+import { subscripRouter } from "./subscricao.route.js";
 
 const globalRouter=Router();
 
@@ -22,6 +23,7 @@ globalRouter.use(psyRouter);
 globalRouter.use(avaliacaoRouter);
 globalRouter.use(logRouter); 
 globalRouter.use(triagemRouter); 
+globalRouter.use(subscripRouter); 
 globalRouter.use(filaRouter);
 globalRouter.use(sessionRouter);
 

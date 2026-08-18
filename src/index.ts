@@ -8,13 +8,15 @@ import dotenv from "dotenv";
 import { globalRouter } from "./routes/global.routes.js";
 import { errorHandler } from "./error-handler/function-error.js";
 import jwt from "jsonwebtoken";
+import client from "./provider/redisConfig.js";
+
 
 dotenv.config();
 const app = express();
 const server = createServer(app);
 app.use(cors());
 const port = process.env.PORT;
-const authConfig =(process.env.SCT as string) 
+const authConfig = process.env.SCT as string;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,39 +36,45 @@ iovariable.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) return next(new Error("No token"));
 
-  jwt.verify(token, authConfig, (error:any, decoded:any) => {
+  jwt.verify(token, authConfig, (error: any, decoded: any) => {
     if (error) return next(new Error("Invalid token"));
 
     const payload = decoded as { id: string; role: number };
-    socket.data.user = payload; 
+    socket.data.user = payload;
     next();
   });
 });
 export const userSockets: Record<string, string> = {};
 // Escutar conexões globais
-iovariable.on("connection", (socket) => {
+iovariable.on("connection", async (socket) => {
   const { id, role } = socket.data.user;
+ 
   userSockets[id] = socket.id;
-  if (role === 2) { 
+  if (role === 2) {
     socket.join("admins");
-  } 
-  else if(role === 1) 
-  {
+    console.log(
+      `Usuário ${id} conectado com socket ${socket.id} na role ${role}`,
+    );
+  } else if (role === 1) {
     socket.join("psicologos");
-  }else{
+    await client.set(`psicologo:${id}`, JSON.stringify({ isLogged: 1 }));
+    const dados = await client.get(`psicologo:${id}`);
+    console.log(`Psicólogo ${id} logado e disponível: ${dados}`)
+  } else {
     socket.join("pacientes");
+    console.log(
+      `Usuário ${id} conectado com socket ${socket.id} na role ${role}`,
+    );
   }
-  console.log(`Usuário ${id} conectado com socket ${socket.id} na role ${role}`);
-  // socket.on("disconnect", () => {
-  //   delete userSockets[id];
-  // });
+  socket.on("disconnect", async () => {
+    await client.set(`psicologo:${id}`, JSON.stringify({ isLogged: 0 }));
+    delete userSockets[id];
+  });
 });
-
 
 // import("../swagger").then(() => {
 //   console.log(`Documentação disponível em http://localhost:${port}/api-docs`);
 // });
-
 
 app.use(errorHandler);
 

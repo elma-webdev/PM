@@ -3,12 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { createLog } from "../../utils/fcuntion.log.js";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
-
-import {
-  logarPsicologo,
-  deslogarPsicologo,
-} from "../../utils/function.udateStatus_psic.js";
-import { ApiError, BadRequest, NotFound } from "../error-handler/api-error.js";
+import { ApiError, BadRequest, NotFound, Unauthorized } from "../error-handler/api-error.js";
 import { createHash } from "crypto";
 import { refresh_token } from "../provider/refresh_token_generate.js";
 import { userLoginSchema } from "./types/triagem.zod.js";
@@ -25,14 +20,27 @@ export const loginUser = async function (
   const ip = req.ip || "unknown-ip";
   const deviceId = `${userAgent}-${ip}`;
 
-    userLoginSchema.parse(req.body)
+  userLoginSchema.parse(req.body);
+
   try {
-  
     const doesUserExists = await prisma.user.findUnique({
       where: { email },
+      include: { psicologo: true },
     });
+
     if (!doesUserExists) {
       throw new BadRequest("O e-mail ou a senha está incorreto.");
+    }
+
+    // 🚫 Bloqueio direto no login
+    if (doesUserExists.role === 1) {
+      const status = doesUserExists.psicologo?.status;
+      if (status === 2) {
+          return res.status(403).json({
+            message:
+              "Seu perfil ainda está em processo de avaliação. Aguarde a verificação para acessar o sistema.",
+          });
+      }
     }
 
     const senhaDigitadaHash = createHash("sha256")
@@ -44,7 +52,11 @@ export const loginUser = async function (
     }
 
     const token = jsonwebtoken.sign(
-      { id: doesUserExists.id, role: doesUserExists.role, nome: doesUserExists.nome },
+      {
+        id: doesUserExists.id,
+        role: doesUserExists.role,
+        nome: doesUserExists.nome,
+      },
       process.env.SCT as string,
       { expiresIn: "8m" },
     );
@@ -59,7 +71,7 @@ export const loginUser = async function (
       nome: doesUserExists.nome,
       sobrenome: doesUserExists.sobrenome,
       email: doesUserExists.email,
-      photo:doesUserExists.photo,
+      photo: doesUserExists.photo,
     };
 
     return res.status(200).json({ user, token, refreshToken });
@@ -72,15 +84,16 @@ export const loginUser = async function (
   }
 };
 
+
 export const logoutUser = async (req: Request, res: Response): Promise<any> => {
   try {
     const { id, role } = req.user;
 
-    const isPsichologist = role === 1 ? { psicologo: true } : undefined;
+    // const isPsichologist = role === 1 ? { psicologo: true } : undefined;
 
     const user = await prisma.user.findUnique({
-      where: { id:id },
-      include: isPsichologist,
+      where: { id: id },
+      // include: isPsichologist,
     });
 
     if (!user) {
@@ -88,7 +101,7 @@ export const logoutUser = async (req: Request, res: Response): Promise<any> => {
     }
 
     // await deslogarPsicologo(user);
-    await createLog("Usuário deslogado", 11, user.id);
+    await createLog("Usuário deslogado", 11, id);
     return res.status(200).json({ message: "Logout realizado com sucesso." });
   } catch (error) {
     console.error("Erro no logout:", error);

@@ -1,7 +1,7 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const userSchema = z.object({
-  photo: z.url().optional(),
+  photo: z.string().optional(),
   nome: z.string().min(1, "Nome é obrigatório"),
   sobrenome: z.string().min(1, "Sobrenome é obrigatório"),
   email: z
@@ -34,8 +34,17 @@ export const patientSchema = z.object({
   user: userSchema,
 });
 export const psychologistSchema = z.object({
-    numero_ordem: z.string().min(1, "Número de ordem é obrigatório"),
-    bio: z.string().optional(),
-    especialidade: z.string().optional(),
-    user: userSchema
+  numero_ordem: z.string().min(1, "Número de ordem é obrigatório"),
+  bio: z.string().optional(),
+  especialidade: z.string().optional(),
+  sexo: z.number().int().optional(),
+  nacionalidade: z.string().optional(),
+  universidade: z.string().optional(),
+  ano_conclusao: z.number().int().optional(),
+  ano_experiencia: z.number().int().optional(),
+  nbi: z.string().optional(),
+  grau_academico: z.string().optional(),
+  idiomas: z.string().optional(),
+  contacto: z.string().optional(),
+  user: userSchema,
 });

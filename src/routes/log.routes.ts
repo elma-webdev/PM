@@ -1,6 +1,6 @@
 import {Router} from "express"; 
-import {getLogPage } from "../controller/logActividade/logs";
-import { permission_Level1 } from "../middleware/permission";
+import {getLogPage } from "../controller/logActividade/logs.js";
+import { permission_Level1 } from "../middleware/permission.js";
 
 const logRouter=Router();
 

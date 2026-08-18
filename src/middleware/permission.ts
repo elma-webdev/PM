@@ -7,7 +7,7 @@ export const permission_Level1 = (
 ) => {
   if (!req.user) {
    console.log(
-     "Permission check failed: No req.user ADMIN found. Is Auth middleware running first?"
+     "Não tem permissão de ADMIN"
    );
      res.status(401).json({ message: "Unauthorized" });
      return;

@@ -19,22 +19,8 @@ export async function createPsicologo(
     if (!parsed.success) {
       throw parsed.error;
     }
-    const { numero_ordem, especialidade, bio, user } = parsed.data;
+    const { numero_ordem, especialidade, bio, user, ano_conclusao, ano_experiencia, contacto, grau_academico, idiomas, nacionalidade, nbi, sexo, universidade } = parsed.data;
     const { nome, email, password, sobrenome } = user;
-    const doesUserExist = await prisma.user.findFirst({
-      where: {
-        email: email,
-      },
-    });
-    const doesOrderNumberExist = await prisma.psicologo.findFirst({
-      where: {
-        numero_ordem: numero_ordem,
-      },
-    });
-
-    if (doesUserExist || doesOrderNumberExist) {
-      throw new Conflict("Usuário já cadastrado no sistema.");
-    }
 
     const file: any = req.file;
     let image = null;
@@ -47,6 +33,15 @@ export async function createPsicologo(
         bio,
         especialidade,
         numero_ordem,
+        ano_conclusao,
+        ano_experiencia,
+        contacto,
+        grau_academico,
+        idiomas,
+        nacionalidade,
+        nbi,
+        sexo,
+        universidade,
         user: {
           create: {
             email,
@@ -66,11 +61,22 @@ export async function createPsicologo(
       psichologist.user_id,
     );
     console.log(image, file);
-    return res.status(201).json(psichologist);
-  } catch (err: unknown) {
+    return res
+      .status(201)
+      .json({
+        message:
+          "Seu perfil entrará em processo de avaliação, dentre em breve receberá um e-mail. Aguarde a verificação para acessar o sistema.",
+      });
+  } catch (err: any) {
     if (err instanceof Error) {
       console.log(err);
       return res.status(500).json({ message: err.message });
+    } else if (err instanceof prisma.PrismaClientKnownRequestError) {
+      if (err.code === "P2002") {
+        return res.status(409).json({
+          message: "Duplicidade detectada: já existe registro com esse valor.",
+        });
+      }
     }
     return res.status(500).json({ message: "Erro desconhecido." });
   }
@@ -78,22 +84,16 @@ export async function createPsicologo(
 export async function getPsicologos(req: Request, res: Response): Promise<any> {
   try {
     const psicologos = await prisma.psicologo.findMany({
+      where: { status: 1 },
       select: {
         user_id: true,
         createdAt: true,
         numero_ordem: true,
         especialidade: true,
         bio: true,
-        avalicao: true,
-        
-        agenda: {
-          select: {
-            isLogged: true,
-          },
-        },
+        avaliacao: true,
         user: {
           select: {
-            id: true,
             email: true,
             nome: true,
             photo: true,
@@ -200,11 +200,8 @@ export async function deletePsicologo(
   }
 }
 
-export async function getUsers(
-  req: Request,
-  res: Response,
-): Promise<any> {
-  try{
+export async function getUsers(req: Request, res: Response): Promise<any> {
+  try {
     const users = await prisma.user.findMany({});
     return res.json(users);
   } catch (err: unknown) {

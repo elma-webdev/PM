@@ -3,6 +3,12 @@
 
 
 ###
+PATCH http://localhost:3000/psicologo/bd0fcd79-53c9-4c00-8d5c-3b2cba88dcdc/accept
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5MDY1MjcsImV4cCI6MTc4NjkwNzAwN30.qCimE3Ae9okFznSWJOLoDdF7mvNFKq3h3-OZqtodwoU
+
+
+###
 
 POST http://localhost:3000/api/forgot-password
 Content-Type: application/json
@@ -23,8 +29,9 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/api/psicologo
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRmNjFlNTM4LTE4ZmItNDhiYi1hMmFlLTMzNTE3MDQwMjg1NiIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4Mjg2MjIwNywiZXhwIjoxNzgyODYyNjg3fQ.w4-2y8z9IvyOwdpy5VSUIm1TlESJrKfowbONUWc9NwY
+PATCH http://localhost:3000/api/psicologo/d543d30a-1249-4c00-af2e-394493efdacd/accept
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5Nzc1NDcsImV4cCI6MTc4Njk3ODAyN30.Bh8-lqUSIpuQEyDEz89qyKKMXa-h80IEqNh6Okdt-0s
+Content-Type: application/json
 
 ###
 POST http://localhost:3000/api/admin
@@ -43,7 +50,7 @@ GET http://localhost:3000/api/dashboard/users
 
 ###
 GET http://localhost:3000/api/psicologo
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRmNjFlNTM4LTE4ZmItNDhiYi1hMmFlLTMzNTE3MDQwMjg1NiIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4Mjg2OTY2NSwiZXhwIjoxNzgyODcwMTQ1fQ.ysAJ5DY0CCpGfe3iA6SQb2c436fbgmjsc5Gf_VNxcgQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5NzcyMjEsImV4cCI6MTc4Njk3NzcwMX0.PzUNKBYRNzPxnfvFHRPSNnuhfwqj7cePLoQTIqvxHAo
 
 ###
 POST http://localhost:3000/api/psicologo
@@ -51,13 +58,12 @@ Content-Type: application/json
 
 {
   "especialidade": "Psicologia clínica",
-  "numero_ordem": "37647387",
+  "numero_ordem": "01010101111",
   "user": {
-      "email": "luana@example.com",
+      "email": "lura@example.com",
       "password": "User123_",
-      "role": 0,
-      "nome": "Luana",
-      "sobrenome": "Cabeche"
+      "nome": "Lura",
+      "sobrenome": "Nunes"
   }
 }
 
@@ -79,15 +85,26 @@ Content-Type: application/json
 }
 
 ###
+GET http://localhost:3000/api/pareamento
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODQ4MTU5NzcsImV4cCI6MTc4NDgxNjQ1N30.CnjqsrMhXbqINShD-HOrCta0DASypgdXpszZfyFW04Y
+###
 
+PATCH http://localhost:3000/api/sessao/accept
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODQ4MTU5NzcsImV4cCI6MTc4NDgxNjQ1N30.CnjqsrMhXbqINShD-HOrCta0DASypgdXpszZfyFW04Y
+
+{
+     "sessao_id": "0945ffb2-70ed-40ad-a14f-a387ae8c536e"
+}
+
+###
 POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
-    "email":"aurora@example.com",
-    "password":"Aurora123_"
+    "email":"anaww@example.com",
+    "password":"User123_"
 }
-
 
 ### post
 POST http://localhost:3000/api/posts
@@ -108,22 +125,26 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/paciente
+POST http://localhost:3000/api/forgot-password
 Content-Type: application/json
 
+
 {
-  "idade":24,
-  "telefone": "900123451",
-  "user": {
-      "email": "Anita@example.com",
-      "password": "User123_",
-      "role": 0,
-      "nome": "Anita",
-      "sobrenome": "Moniz"
-  }
+    "email":"milton@yahoo.com"
 }
-###
-GET http://localhost:3000/api/agenda/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ1NmQ3OTVhLTVmZDktNDdkMy1hMGQxLTU5OTE4ODViZTIyYyIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4MjU2NTM2NiwiZXhwIjoxNzgyNTY1ODQ2fQ.W4BJeUlkxVIYN6LxXdQrFOvzu-k63ET2KJOKrzbFr-Q
 
 ###
+ 
+POST http://localhost:3000/api/reset-password
+Content-Type: application/json
+
+
+{
+    "email":"milton@yahoo.com",
+    "code":"3391",
+    "newPassword":"Milton123_"
+}
+
+###
+GET http://localhost:3000/api/psicologo/requests
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5NzcyMjEsImV4cCI6MTc4Njk3NzcwMX0.PzUNKBYRNzPxnfvFHRPSNnuhfwqj7cePLoQTIqvxHAo

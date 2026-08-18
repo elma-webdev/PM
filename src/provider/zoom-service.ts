@@ -28,7 +28,7 @@ const generateZoomToken = async() : Promise<any> => {
         })
 
     const jsonResponse = await response.json();
-    console.log("generateZoomAccessToken Response --> ", jsonResponse);
+   
     return jsonResponse
 
     } catch (error) {
@@ -38,7 +38,7 @@ const generateZoomToken = async() : Promise<any> => {
 }
 
 
-const generateZoomMeeting = async () => {
+export const generateZoomMeeting = async ( inicio?: Date, tipo?: number) => {
     try {
         const zoomAccessToken = await generateZoomToken();
 
@@ -73,8 +73,8 @@ const generateZoomMeeting = async () => {
                         },
                         calendar_type: 1,
                         contact_email: "jujap2024@gmail.com",
-                        contact_name: "Juelma Pereira",
-                        // email_notification: true,
+                        contact_name: "Juelma Pereira- Osande Platform",
+                        email_notification: true,
                         encryption_type: "enhanced_encryption",
                         focus_mode: true,
                         // global_dial_in_countries: ["US"],
@@ -95,33 +95,18 @@ const generateZoomMeeting = async () => {
                             enable: true,
                         },
                     },
-                    start_time: new Date().toISOString(),
+                    start_time: inicio?.toISOString() || new Date().toISOString(),
                     timezone: "Africa/Luanda",
                     topic: "Sessão de saúde mental",
-                    type: 1, // 1 -> Instant Meeting, 2 -> Scheduled Meeting
+                    type: tipo || 1, // 1 -> Instant Meeting, 2 -> Scheduled Meeting
                 }),
             }
         );
 
         const jsonResponse = await response.json();
-
-        console.log("generateZoomMeeting JsonResponse --> ", jsonResponse);
+        return jsonResponse
     } catch (error) {
         console.log("generateZoomMeeting Error --> ", error);
         throw error;
     }
 };
-generateZoomMeeting()
-// dados:
-//id
-//  join_url:,
-//  chat_join_url:,
-//  password:,
-// id: ,
-//start_url:,
-//created_at: ou start_time se for agendada,
-//agenda:,
-//host_email,
-//type
-//topic,
-//duration

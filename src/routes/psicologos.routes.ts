@@ -6,12 +6,8 @@ const psyRouter = Router();
 import multer from "multer";
 const upload = multer({ storage:multer.memoryStorage() });
 
-psyRouter.get("/users", (req, res) => {
-  console.log("Rota /api/users chamada!");
-  res.send("ok");
-});
-psyRouter.post("/psicologo", upload.single('photo'), PsicologoController.createPsicologo);
 
+psyRouter.post("/psicologo", upload.single('photo'), PsicologoController.createPsicologo);
 
 psyRouter.get(
   "/psicologo",
