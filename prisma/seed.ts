@@ -2,79 +2,48 @@ import { prisma } from "../lib/prisma.js";
 import { createHash } from "crypto";
 async function Seed() {
   console.log("AQUI");
+  // d543d30a-1249-4c00-af2e-394493efdacd
+  //bb0d208c-4021-4901-8741-a5ec63419ec5
 
-  // await prisma.privilegio.createMany({
-  //   data: [
-  //     {
-  //       nome: "Limite de 10 pacientes",
-  //       descricao: "Atender até 10 pacientes ativos",
-  //     },
-  //     {
-  //       nome: "Agendamento simples",
-  //       descricao: "Agendamento sem integração externa",
-  //     },
-  //     {
-  //       nome: "Perfil activo na plataforma",
-  //       descricao: "Perfil visível pelos pacientes",
-  //     },
-  //     { nome: "Chat em tempo real", descricao: "Enviar e receber mensagens" },
-  //     {
-  //       nome: "Dashboard ",
-  //       descricao:
-  //         "Ver resumo de sessões agendadas, atendidas e pacientes activos",
-  //     },
-  //     {
-  //       nome: "Limite de 30 pacientes",
-  //       descricao: "Atender até 30 pacientes",
-  //     },
-  //     {
-  //       nome: "Sessão instantânea",
-  //       descricao: "Realização de sessões virtuais instantâneas",
-  //     },
-  //     {
-  //       nome: "Publicação de posts",
-  //       descricao: "Fazer publicação em sua rede",
-  //     },
-  //     {
-  //       nome: "Agendamento com integração",
-  //       descricao: "Agendar sessões com o Google Calendar",
-  //     },
-  //     {
-  //       nome: "Dashboard avançados",
-  //       descricao:
-  //         "Ver resumo de sessões agendadas, atendidas, pacientes activos e faturamentos",
-  //     },
-  //     {
-  //       nome: "Sem limite de pacientes",
-  //       descricao: "Atender quantos pacientes quiser",
-  //     },
-  //     {
-  //       nome: "Suporte prioritário",
-  //       descricao: "Atendimento rápido pelo suporte",
-  //     },
-  //     {
-  //       nome: "Maior visibilidade",
-  //       descricao: "Ter destaque nas pesquisas de psicólogos",
-  //     },
-  //     {
-  //       nome: "Integração completa com Google Calendar",
-  //       descricao: "Gerenciar agendamento a partir do Google Calendar",
-  //     },
-  //   ],
-  // });
+  // const pacientes = await prisma.paciente.findMany();
 
-  const user = await prisma.user.create({
-    data: {
-      role: 1,
-      nome: "Admin",
-      sobrenome: "Admin",
-      email: "admin@example.com",
-      photo: null,
-      password: "admin",
-    },
-  });
+  // for (const paciente of pacientes) {
+  //     const asksession = await prisma.sessao.updateMany({
+  //       data: {
+  //         paciente_id: paciente.user_id,
+  //         psicologo_id: "bb0d208c-4021-4901-8741-a5ec63419ec5",
+  //         modo_sessao: 1,
+  //         status:5
+  //       },
+  //     });
+ 
+      // const asksession = await prisma.pagamento.updateMany({
+      //   data: {
+      //     referencia: "012784901",
+      //   },
+      // });
 
-  console.log(user);
+      // const psicologos=await prisma.psicologo.updateMany({
+      //   data:{
+      //   bio: "Biografia disponível para todos verem.",
+      //   sexo: 1,
+      //   contacto: "+244 999999999",
+      //   idiomas: "Português",
+      //   nbi: "123456789",
+      //   grau_academico: "Licenciatura",
+      //   especialidade: "Psicologia Clínica",
+      //   nacionalidade: "Angolana",
+      //   universidade: "Universidade Agostinho Neto",
+      //   ano_conclusao: 2019,
+      //   ano_experiencia: 10,
+      //   modalidade: 3
+      //   }
+      // })
+      const psicologos = await prisma.psicologo.findMany({})
+      console.log(psicologos);
+  
+
+
 }
 
 Seed()

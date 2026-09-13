@@ -1,10 +1,11 @@
 import {Router} from "express"
-import { createAgenda, getAgenda } from "../controller/agenda/agenda.js";
+import { createAgenda, getAgenda} from "../controller/agenda/agenda.js";
 import { permissionBoth } from "../middleware/permission.js";
 import { Auth } from "../middleware/Auth.js";
 const agendaRouter=Router()
 
 agendaRouter.post("/agenda", Auth, createAgenda);
-agendaRouter.get('/agenda/', Auth,getAgenda)
+agendaRouter.get('/agenda/:psicologo_id', Auth,getAgenda)
+
 
 export {agendaRouter}

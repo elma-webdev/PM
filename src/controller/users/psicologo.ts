@@ -19,7 +19,21 @@ export async function createPsicologo(
     if (!parsed.success) {
       throw parsed.error;
     }
-    const { numero_ordem, especialidade, bio, user, ano_conclusao, ano_experiencia, contacto, grau_academico, idiomas, nacionalidade, nbi, sexo, universidade } = parsed.data;
+    const {
+      numero_ordem,
+      especialidade,
+      bio,
+      user,
+      ano_conclusao,
+      ano_experiencia,
+      contacto,
+      grau_academico,
+      idiomas,
+      nacionalidade,
+      nbi,
+      sexo,
+      universidade,
+    } = parsed.data;
     const { nome, email, password, sobrenome } = user;
 
     const file: any = req.file;
@@ -61,12 +75,10 @@ export async function createPsicologo(
       psichologist.user_id,
     );
     console.log(image, file);
-    return res
-      .status(201)
-      .json({
-        message:
-          "Seu perfil entrará em processo de avaliação, dentre em breve receberá um e-mail. Aguarde a verificação para acessar o sistema.",
-      });
+    return res.status(201).json({
+      message:
+        "Seu perfil entrará em processo de avaliação, dentre em breve receberá um e-mail. Aguarde a verificação para acessar o sistema.",
+    });
   } catch (err: any) {
     if (err instanceof Error) {
       console.log(err);
@@ -87,19 +99,30 @@ export async function getPsicologos(req: Request, res: Response): Promise<any> {
       where: { status: 1 },
       select: {
         user_id: true,
-        createdAt: true,
-        numero_ordem: true,
-        especialidade: true,
         bio: true,
-        avaliacao: true,
+        sexo: true,
+        agenda: true,
+        contacto: true,
+        idiomas: true,
+        numero_ordem: true,
+        nbi: true,
+        grau_academico: true,
+        especialidade: true,
+        nacionalidade: true,
+        universidade: true,
+        ano_conclusao: true,
+        ano_experiencia: true,
+        modalidade: true,
         user: {
           select: {
-            email: true,
-            nome: true,
             photo: true,
-            sobrenome: true,
+            createdAt: true,
+            nome:true,
+            sobrenome:true,
+            email:true
           },
         },
+        avaliacao: true,
       },
     });
 
@@ -125,14 +148,30 @@ export async function getPsicologoById(
       select: {
         user_id: true,
         bio: true,
+        sexo: true,
         agenda: true,
+        contacto: true,
+        idiomas: true,
+        numero_ordem: true,
+        nbi: true,
+        grau_academico: true,
+        especialidade: true,
+        nacionalidade: true,
+        universidade: true,
+        ano_conclusao: true,
+        ano_experiencia: true,
+        modalidade: true,
         user: {
           select: {
             photo: true,
             createdAt: true,
+            nome: true,
+            sobrenome: true,
+            email: true,
           },
         },
         posts: true,
+        avaliacao: true,
       },
     });
 

@@ -110,3 +110,18 @@ export const generateZoomMeeting = async ( inicio?: Date, tipo?: number) => {
         throw error;
     }
 };
+
+    // const meetingPayload = {
+    //   id: meeting.id,
+    //   join_url: meeting.join_url,
+    //   password: meeting.password,
+    //   start_url: meeting.start_url,
+    //   created_at: meeting.created_at,
+    //   agenda: meeting.agenda,
+    //   host_id: meeting.host_id,
+    //   host_email: meeting.host_email,
+    //   type: meeting.type,
+    //   status: meeting.status,
+    //   topic: meeting.topic,
+    //   duration: meeting.duration,
+    // };

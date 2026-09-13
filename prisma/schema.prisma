@@ -10,11 +10,10 @@ datasource db {
 //psicologo
 model Agenda_psicologo {
   agenda_id              String    @id @default(uuid())
-  modalidade Int @default(0) // 0: online, 1: presencial, 2:hibrida
-  isLogged               Int?      @map("is_logged")
-  psicologo_id           String    @unique(map: "psicologo_agenda")    @map("psicologo_id")
+  psicologo_id           String    @map("psicologo_id")
   psicologo              Psicologo @relation("relacao_agenda", fields: [psicologo_id], references: [user_id], onDelete: Cascade)
-  disponibilidade Json? 
+  dataHora DateTime
+  disponibilidade Boolean @default(true) 
 
   @@map("agendas")
 }
@@ -30,13 +29,15 @@ model Psicologo {
   universidade  String?
   ano_conclusao Int?
   ano_experiencia Int?
+  modalidade Int? @default(0) // 0: online, 1: presencial, 2:hibrida
+  isLogged               Int?  @default(0)    @map("is_logged")
   nbi             String?
   grau_academico String?
   idiomas        String?
   contacto      String?
   updatedAt     DateTime          @default(now())
   status        Int               @default(2)
-  agenda        Agenda_psicologo? @relation("relacao_agenda")
+  agenda        Agenda_psicologo[] @relation("relacao_agenda")
   avaliacao     Avaliacao[]       @relation("Avaliacao_recebida")
   posts         Post[]
   user          User              @relation(fields: [user_id], references: [id])
@@ -142,7 +143,7 @@ model Pagamento{
   pagamento_id  String    @id @default(uuid())
   quantia Decimal
   metodo String @default("EMIS")
-  status       String   // 
+  status       Int @default(2)
   referencia String?
   observacao String @db.VarChar(255)
   createdAt   DateTime @default(now())
@@ -295,7 +296,6 @@ model Notificacao {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
   notificacoes UserNotificacao[]
-
   @@map("notificacoes")
 }
 model UserNotificacao {

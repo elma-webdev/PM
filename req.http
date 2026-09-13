@@ -3,12 +3,6 @@
 
 
 ###
-PATCH http://localhost:3000/psicologo/bd0fcd79-53c9-4c00-8d5c-3b2cba88dcdc/accept
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5MDY1MjcsImV4cCI6MTc4NjkwNzAwN30.qCimE3Ae9okFznSWJOLoDdF7mvNFKq3h3-OZqtodwoU
-
-
-###
 
 POST http://localhost:3000/api/forgot-password
 Content-Type: application/json
@@ -29,28 +23,23 @@ Content-Type: application/json
 }
 
 ###
-PATCH http://localhost:3000/api/psicologo/d543d30a-1249-4c00-af2e-394493efdacd/accept
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5Nzc1NDcsImV4cCI6MTc4Njk3ODAyN30.Bh8-lqUSIpuQEyDEz89qyKKMXa-h80IEqNh6Okdt-0s
+GET http://localhost:3000/api/vinculo/bb0d208c-4021-4901-8741-a5ec63419ec5
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODc3MTExNzYsImV4cCI6MTc4NzcxMTY1Nn0.wpfw0TSn7T8giC6SCxhHIYtjLzC7751XJU4PecYhrAQ
+
+### psicologos sessao
+GET http://localhost:3000/api/sessao/bb0d208c-4021-4901-8741-a5ec63419ec5/pedidos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODgzMTAxOTksImV4cCI6MTc4ODMxMDY3OX0.dKlgZS4QISU3tVggCr11czJ7xBAn1CSOx83D0HslELw
+Content-Type: application/json
+
+### pacientes sessao
+GET http://localhost:3000/api/sessao/paciente/0546331d-3e13-43c5-8b33-903c7aa885ad/pedidos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODgzOTIzMTcsImV4cCI6MTc4ODM5Mjc5N30.vWPHCbGNG_X6pFQHkQ0YgDJl1UXRTN9WSmmV-epzpvQ
 Content-Type: application/json
 
 ###
-POST http://localhost:3000/api/admin
-Content-Type: application/json
 
-{
-    "email": "teste@example.com",
-    "password": "Teste123_",
-    "role": 2,
-    "nome": "John",
-    "sobrenome": "Mark Doe"
-}
-###
-GET http://localhost:3000/api/dashboard/users
-
-
-###
-GET http://localhost:3000/api/psicologo
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5NzcyMjEsImV4cCI6MTc4Njk3NzcwMX0.PzUNKBYRNzPxnfvFHRPSNnuhfwqj7cePLoQTIqvxHAo
+GET http://localhost:3000/api/sessao/bb0d208c-4021-4901-8741-a5ec63419ec5/pedidos/accepted
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODc2OTEyMDgsImV4cCI6MTc4NzY5MTY4OH0.W0hsIy5m8laJEO3ERF2hYU3tFRIbsPtNhVUWCDIlCgQ
 
 ###
 POST http://localhost:3000/api/psicologo
@@ -87,15 +76,7 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/api/pareamento
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODQ4MTU5NzcsImV4cCI6MTc4NDgxNjQ1N30.CnjqsrMhXbqINShD-HOrCta0DASypgdXpszZfyFW04Y
-###
 
-PATCH http://localhost:3000/api/sessao/accept
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODQ4MTU5NzcsImV4cCI6MTc4NDgxNjQ1N30.CnjqsrMhXbqINShD-HOrCta0DASypgdXpszZfyFW04Y
-
-{
-     "sessao_id": "0945ffb2-70ed-40ad-a14f-a387ae8c536e"
-}
 
 ###
 POST http://localhost:3000/api/login
@@ -106,14 +87,9 @@ Content-Type: application/json
     "password":"User123_"
 }
 
-### post
-POST http://localhost:3000/api/posts
-Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImRmNjFlNTM4LTE4ZmItNDhiYi1hMmFlLTMzNTE3MDQwMjg1NiIsInJvbGUiOjEsIm5vbWUiOiJBdXJvcmEgQ2FiZWNoZSIsImlhdCI6MTc4Mjg1NzY0OSwiZXhwIjoxNzgyODU4MTI5fQ.YEebn6AqPpcCktcO7hEb2w_6-ZZHGTzEPEOU753CamM
-
-{
-    "content":"Perdoe-se sempre", "hastags":"saude, bem-estar", "photoUrl":"foto de teste", "psicologo_id":"083392da-1e36-4d0c-854d-f15feab09665"
-}
+####
+GET http://localhost:3000/api/psicologo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODkwNjkxMTMsImV4cCI6MTc4OTA2OTU5M30.8EcJZP95AXILfgtwndi9Via9zfU3Jqe8ImfKPc05i4o
 
 #### Refresh token
 
@@ -125,26 +101,11 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/forgot-password
+POST http://localhost:3000/api/sessao/accept
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODczNDM2OTMsImV4cCI6MTc4NzM0NDE3M30.TKaMFod1ZwLgi399Cu3yKVoMS15_2iDOtGUJ5blAe5E
 Content-Type: application/json
 
-
 {
-    "email":"milton@yahoo.com"
+    "sessao_id":"00b7e430-8342-48ed-93f3-1814568f3d19",
+    "quantia":"2000"
 }
-
-###
- 
-POST http://localhost:3000/api/reset-password
-Content-Type: application/json
-
-
-{
-    "email":"milton@yahoo.com",
-    "code":"3391",
-    "newPassword":"Milton123_"
-}
-
-###
-GET http://localhost:3000/api/psicologo/requests
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODY5NzcyMjEsImV4cCI6MTc4Njk3NzcwMX0.PzUNKBYRNzPxnfvFHRPSNnuhfwqj7cePLoQTIqvxHAo

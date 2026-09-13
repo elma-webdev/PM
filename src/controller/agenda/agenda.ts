@@ -6,8 +6,8 @@ export const createAgenda = async function (
   res: Response,
 ): Promise<any> {
   const { id } = req.user;
-  const { slots, modalidade, disponibilidade } = req.body;
-  // slots = array de objetos { dataHora, ocupado, modalidade }
+  const {dataHora, disponibilidade}=req.body
+
   try {
     const doesPsicologoExists = await prisma.psicologo.findUnique({
       where: { user_id: id },
@@ -19,8 +19,7 @@ export const createAgenda = async function (
 
     const agenda = await prisma.agenda_psicologo.create({
       data: {
-        modalidade,
-        disponibilidade,
+        dataHora, disponibilidade,
         psicologo_id: id,
       },
     });
@@ -39,7 +38,8 @@ export const getAgenda = async function (
   res: Response,
 ): Promise<any> {
   try {
-    const agenda = await prisma.agenda_psicologo.findMany();
+    const { psicologo_id } = req.params;
+    const agenda = await prisma.agenda_psicologo.findMany({where: { psicologo_id }});
     return res.json(agenda);
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -49,26 +49,58 @@ export const getAgenda = async function (
   }
 };
 
-export async function ocuparSlot(psicologo_id: string, dataHora: string) {
+export const updateSlot = async function (
+  req: Request,
+  res: Response,
+): Promise<any> {
+  try {
+    const { id } = req.user;
+    const { agenda_id } = req.params;
+    const { disponibilidade, dataHora} = req.body;
 
-  const agenda = await prisma.agenda_psicologo.findUnique({
-    where: { psicologo_id },
+    const doesPsicologoExists = await prisma.psicologo.findUnique({
+      where: { user_id: id },
+      include: {
+        agenda_psicologo: true,
+      },
+    });
+
+    if (!doesPsicologoExists) {
+      throw new NotFound("Este usuário não existe");
+    }
+
+    if (!doesPsicologoExists.agenda_psicologo.agenda_id) {
+      throw new NotFound("Agenda não encontrada.");
+    }
+   
+  const agenda = await prisma.agenda_psicologo.update({
+    where: { agenda_id },
+    data: { disponibilidade, dataHora },
   });
-
-  if (!agenda || !agenda.disponibilidade) {
-    throw new Error("Agenda não encontrada.");
+    
+    return res.status(200).json(agenda);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      return res.status(500).json({ message: err.message });
+    }
+    return res.status(500).json({ message: "Erro desconhecido." });
   }
+};
+// export async function ocuparSlot(psicologo_id: string, dataHora: string) {
+//   const 
+//   const agenda = await prisma.agenda_psicologo.findUnique({
+//     where: { psicologo_id },
+//   });
 
-  const slots = (agenda.disponibilidade as any[]).map((slot) =>
-    slot.dataHora === dataHora ? { ...slot, ocupado: true } : slot
-  );
+//   if (!agenda || !agenda.disponibilidade) {
+//     throw new Error("Agenda não encontrada.");
+//   }
 
-  // Atualiza a agenda
-  const updatedAgenda = await prisma.agenda_psicologo.update({
-    where: { psicologo_id },
-    data: { disponibilidade: slots },
-  });
-  console.log(slots)
-  return updatedAgenda;
-}
-
+//   // Atualiza a agenda
+//   const agenda = await prisma.agenda_psicologo.update({
+//     where: { psicologo_id },
+//     data: { disponibilidade: false },
+//   });
+//   console.log(agenda);
+//   return agenda;
+// }
