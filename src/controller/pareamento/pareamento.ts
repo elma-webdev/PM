@@ -23,15 +23,15 @@ const MarcarSessaoInstantanea = async (
       throw new Error("Agenda não encontrada.");
     }
 
-    // const agenda = await prisma.agenda_psicologo.update({
-    //   where: { agenda_id },
-    //   data: { disponibilidade: false },
-    // });
-    // console.log("Agenda atualizada:", agenda);
+    const agenda = await prisma.agenda_psicologo.update({
+      where: { agenda_id },
+      data: { disponibilidade: false },
+    });
+
+    console.log("Agenda marcada como indisponível: ", agenda);
 
     const doesSessionExists = await prisma.sessao.findFirst({
       where: {
-        psicologo_id: psicologo_id,
         paciente_id: id,
         status: 5, // pendente
       },
@@ -39,7 +39,7 @@ const MarcarSessaoInstantanea = async (
 
     if (doesSessionExists) {
       return res.status(400).json({
-        message: "Você já possui uma sessão pendente com este psicólogo",
+        message: "Você já possui uma sessão pendente com um psicólogo",
       });
     }
 
@@ -60,7 +60,7 @@ const MarcarSessaoInstantanea = async (
         },
         notificacao: {
           create: {
-            mensagem: " Um paciente solicitou uma sessão instantânea.",
+            mensagem: "Um paciente solicitou uma sessão instantânea.",
           },
         },
       },
@@ -82,7 +82,7 @@ const MarcarSessaoInstantanea = async (
 const AgendarSessao = async (req: Request, res: Response): Promise<any> => {
   const { id } = req.user;
   const { psicologo_id, modo } = req.params;
-  const { agenda_id, dataHora } = req.body;
+  const { agenda_id } = req.body;
 
   let modoSessao: number;
 
@@ -114,7 +114,6 @@ const AgendarSessao = async (req: Request, res: Response): Promise<any> => {
 
     const doesSessionExists = await prisma.sessao.findFirst({
       where: {
-        psicologo_id: psicologo_id,
         paciente_id: id,
         status: 5, // pendente
       },
@@ -124,7 +123,7 @@ const AgendarSessao = async (req: Request, res: Response): Promise<any> => {
       return res
         .status(400)
         .json({
-          message: "Você já possui uma sessão pendente com este psicólogo",
+          message: "Você já possui uma sessão pendente com um psicólogo",
         });
     }
 
@@ -134,7 +133,7 @@ const AgendarSessao = async (req: Request, res: Response): Promise<any> => {
         paciente_id: id,
         status: 5, // pendente
         modo_sessao: modoSessao,
-        inicio:dataHora
+        inicio: agenda.dataHora
       },
     });
     const notificacao = await prisma.userNotificacao.create({

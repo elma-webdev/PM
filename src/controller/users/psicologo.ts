@@ -15,9 +15,13 @@ export async function createPsicologo(
   res: Response,
 ): Promise<any> {
   try {
+    // Se vier via FormData, req.body.user é string
+    if (req.body.user && typeof req.body.user === "string") {
+      req.body.user = JSON.parse(req.body.user);
+    }
     const parsed = psychologistSchema.safeParse(req.body);
     if (!parsed.success) {
-      throw parsed.error;
+      return res.status(409).json({ message: parsed.error });
     }
     const {
       numero_ordem,
@@ -34,7 +38,20 @@ export async function createPsicologo(
       sexo,
       universidade,
     } = parsed.data;
+
     const { nome, email, password, sobrenome } = user;
+
+    const doesEmailExist = await prisma.user.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    if (doesEmailExist) {
+      return res
+        .status(409)
+        .json({ message: "Usuário ja cadastrado no sistema." });
+    }
 
     const file: any = req.file;
     let image = null;

@@ -9,17 +9,28 @@ import { globalRouter } from "./routes/global.routes.js";
 import { errorHandler } from "./error-handler/function-error.js";
 import jwt from "jsonwebtoken";
 import client from "./provider/redisConfig.js";
+import cookieParser from "cookie-parser";
 
 
 dotenv.config();
 const app = express();
 const server = createServer(app);
-app.use(cors());
+
 const port = process.env.PORT;
 const authConfig = process.env.SCT as string;
 
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); 
+
+app.use("/api", globalRouter);
+
 
 // app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api", globalRouter);
@@ -27,10 +38,8 @@ app.use("/api", globalRouter);
 export const iovariable = new Server(server, {
   cors: {
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "UPDATE", "DELETE", "PATCH"],
   },
 });
-
 // salvar dados de autenticacao
 iovariable.use((socket, next) => {
   const token = socket.handshake.auth.token;

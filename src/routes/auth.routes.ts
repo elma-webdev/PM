@@ -10,7 +10,7 @@ const loginRouter = Router();
 
 
 loginRouter.post("/login", loginUser);
-loginRouter.post("/refresh", RefreshToken);
+loginRouter.post("/auth/refresh", RefreshToken);
 loginRouter.post("/reset-password", resetPassword);
 loginRouter.post("/forgot-password",forgotPassword)
 

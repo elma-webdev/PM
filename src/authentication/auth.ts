@@ -7,6 +7,7 @@ import { ApiError, BadRequest, NotFound, Unauthorized } from "../error-handler/a
 import { createHash } from "crypto";
 import { refresh_token } from "../provider/refresh_token_generate.js";
 import { userLoginSchema } from "./types/triagem.zod.js";
+import dayjs from "dayjs";
 dotenv.config();
 
 const prisma = new PrismaClient();
@@ -36,10 +37,10 @@ export const loginUser = async function (
     if (doesUserExists.role === 1) {
       const status = doesUserExists.psicologo?.status;
       if (status === 2) {
-          return res.status(403).json({
-            message:
-              "Seu perfil ainda está em processo de avaliação. Aguarde a verificação para acessar o sistema.",
-          });
+        return res.status(403).json({
+          message:
+            "Seu perfil ainda está em processo de avaliação. Aguarde a verificação para acessar o sistema.",
+        });
       }
     }
 
@@ -61,6 +62,9 @@ export const loginUser = async function (
       { expiresIn: "8m" },
     );
 
+    const expiresInSeconds = dayjs().add(7, "day").unix();
+    const durationMs = (expiresInSeconds - dayjs().unix()) * 1000;
+
     const refreshToken = await refresh_token(doesUserExists.id, ip, deviceId);
 
     await createLog("Usuário logado", 1, doesUserExists.id);
@@ -73,8 +77,14 @@ export const loginUser = async function (
       email: doesUserExists.email,
       photo: doesUserExists.photo,
     };
-
-    return res.status(200).json({ user, token, refreshToken });
+    // Guardar refresh token em cookie httpOnly
+    res.cookie("refreshToken", refreshToken.refresh, {
+      httpOnly: true,
+      secure: false, // só via HTTPS
+      sameSite: "strict", // evita CSRF
+      maxAge: durationMs
+    });
+    return res.status(200).json({ user, token });
   } catch (err: unknown) {
     if (err instanceof ApiError) {
       return res.status(err.status).json({ message: err.message });

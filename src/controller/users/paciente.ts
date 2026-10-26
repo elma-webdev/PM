@@ -11,9 +11,14 @@ export async function createPaciente(
   res: Response,
 ): Promise<any> {
   try {
+    // Se vier via FormData, req.body.user é string
+    if (req.body.user && typeof req.body.user === "string") {
+      req.body.user = JSON.parse(req.body.user);
+    }
     const parsed = patientSchema.safeParse(req.body);
     if (!parsed.success) {
-      throw parsed.error;
+      console.log(parsed.error);
+      return res.status(400).json({ message: parsed.error });
     }
     const { idade, telefone, user } = parsed.data;
     const { nome, email, password, sobrenome } = user;
@@ -24,7 +29,9 @@ export async function createPaciente(
     });
 
     if (doesUserExist) {
-      throw new Conflict("Usuário já cadastrado no sistema.");
+      return res
+        .status(409)
+        .json({ message: "Usuário ja cadastrado no sistema." });
     }
 
     const file: any = req.file;

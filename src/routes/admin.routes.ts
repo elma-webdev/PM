@@ -17,8 +17,8 @@ adminRouter.get("/dashboard/users", getAllUsers)
 adminRouter.get("/apenasAdmin", Auth, ApenasAdmin)
 
 
-adminRouter.get("/notification/:user_id/unread", Auth, UnreadNotification)
-adminRouter.patch("/notification/:user_id/read", Auth, ReadNotification)
+adminRouter.get("/notification/unread", Auth, UnreadNotification)
+adminRouter.patch("/notification/read", Auth, ReadNotification)
 adminRouter.post("/notification/:user_id", Auth, CreateNotification)
 
 

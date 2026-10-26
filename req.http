@@ -73,17 +73,23 @@ Content-Type: application/json
   }
 }
 
-###
-GET http://localhost:3000/api/pareamento
+### 
+GET htt/p://localhost:3000/api/pareamento
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODQ4MTU5NzcsImV4cCI6MTc4NDgxNjQ1N30.CnjqsrMhXbqINShD-HOrCta0DASypgdXpszZfyFW04Y
 
-
+iiiiiiii
 ###
+###
+
+GET http://localhost:3000/api/notification/unread
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJiMGQyMDhjLTQwMjEtNDkwMS04NzQxLWE1ZWM2MzQxOWVjNSIsInJvbGUiOjEsIm5vbWUiOiJKb25hcyIsImlh;kkkiidCI6MTc5MDUyMzk5NSwiZXhwIjoxNzkwNTI0NDc1fQ.uS_Aa4P4_jr8mPpnyTFDQXbOwqco_UnyHdhRB5Wq8TI
+###vgftt5egf nnnnnnnnnnzbc
+
 POST http://localhost:3000/api/login
 Content-Type: application/json
 
 {
-    "email":"anaww@example.com",
+    "email":"jonas@example.com",
     "password":"User123_"
 }
 
@@ -109,3 +115,7 @@ Content-Type: application/json
     "sessao_id":"00b7e430-8342-48ed-93f3-1814568f3d19",
     "quantia":"2000"
 }
+
+###
+PATCH http://localhost:3000/api/sessao/00b7e430-8342-48ed-93f3-1814568f3d19/599c610a-7213-4ac4-84ea-e62cb52daa5a/confirm-payment
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODk1Njk4MjUsImV4cCI6MTc4OTU3MDMwNX0.vXseb2uzuDsxg8EWuli8BgWny0PTEFzgoYeBewaTVIE

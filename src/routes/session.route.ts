@@ -28,7 +28,7 @@ sessionRouter.post("/sessao/:psicologo_id/agendar/:modo", Auth, AgendarSessao);
 sessionRouter.post("/sessao/accept", Auth, AcceptSessoes);
 sessionRouter.patch("/sessao/reject", Auth, DenySessao);
 sessionRouter.patch("/sessao/concluded", Auth, FinishSessao);
-sessionRouter.post("/sessao/:sessao_id/confirm-payment", Auth, PaySessao);
+sessionRouter.patch("/sessao/:sessao_id/:pagamento_id/confirm-payment", Auth, PaySessao);
 sessionRouter.get("/sessao/:psicologo_id/pedidos", Auth, SessaoRequestByPsicologo);
 sessionRouter.get("/sessao/paciente/:paciente_id/pedidos", Auth, SessaoRequestByPaciente);
 sessionRouter.get("/sessao/:psicologo_id/pedidos/accepted", Auth, GetAllPsicologoSessaoRequestAccepted);

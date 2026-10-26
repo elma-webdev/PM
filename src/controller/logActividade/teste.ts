@@ -8,5 +8,6 @@ export const ApenasAdmin = async (req: Request, res: Response): Promise<any> => 
     iovariable.to("admins").emit("notification", {
     message: "Apenas admins podem ver",
   });
+  
 }
 

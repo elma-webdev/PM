@@ -283,7 +283,7 @@ model PacientePsicologo {
 model RefreshToken {
   token_id   String @id @default(uuid())
   expiresIn  Int
-  refresh    String
+  refresh    String  @unique
   user_id    String
   user_agent String
   ip         String

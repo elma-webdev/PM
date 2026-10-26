@@ -63,7 +63,7 @@ export const AcceptSessoes = async (
     const mensagem =
       sessao.modo_sessao === 0
         ? `O psicólogo aceitou a solicitação de sessão instantanea. Confirme o pagamento para ser atendido. `
-        : `O psicólogo aceitou a solicitação de sessão por agenda. Verifique a agenda do psicólogo, escolha o melhor horário e confirme o pagamento para ser atendido.`;
+        : `O psicólogo aceitou a solicitação de sessão por agenda. Confirme o pagamento para ser atendido.`;
 
     const paciente_id = sessao.paciente_id;
     iovariable.to(userSockets[paciente_id]).emit("notification_pareamento", {
@@ -218,16 +218,18 @@ export const PaySessao = async (
   try {
     let meeting: any;
 
-    const { sessao_id } = req.params;
+    const { pagamento_id, sessao_id } = req.params;
 
     const doesPaymentExists = await prisma.pagamento.findFirst({
       where: { sessaoId: sessao_id, status: 1 },
     });
 
-    if (doesPaymentExists) throw new Conflict("Pagamento já realizado");
+    if (doesPaymentExists){
+      return res.status(409).json({ message: "Pagamento já realizado" });
+    } 
 
     const confirmarPagamento = await prisma.pagamento.update({
-      where: { sessaoId: sessao_id },
+      where: { pagamento_id },
       data: { status: 1 },
     });
 
@@ -236,6 +238,7 @@ export const PaySessao = async (
     });
 
     if (existsSessao?.modo_sessao === 0) {
+      
       meeting = await generateZoomMeeting();
       const sessao = await prisma.sessao.update({
         where: { sessao_id },
@@ -284,7 +287,11 @@ export const PaySessao = async (
         where: { sessao_id },
         data: {
           status: 2,
-          link_meet: meeting.join_url,
+          extra_data: {
+            guest: meeting.join_url,
+            host: meeting.start_url,
+            password: meeting.password,
+          }
         },
       });
       await prisma.userNotificacao.create({
