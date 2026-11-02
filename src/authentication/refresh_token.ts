@@ -1,9 +1,8 @@
 import jsonwebtoken from "jsonwebtoken";
 import dayjs from "dayjs";
 import { BadRequest } from "../error-handler/api-error.js";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../lib/prisma.js";
 import { Request, Response } from "express";
-const prisma = new PrismaClient();
 
 export const RefreshToken = async (
   req: Request,

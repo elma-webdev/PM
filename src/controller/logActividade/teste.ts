@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import { iovariable, userSockets } from "../../index.js";
-// import { PrismaClient } from "@prisma/client";
+
+
 import { prisma } from "../../../lib/prisma.js";
+import { iovariable } from "../../server.ts";
 
 
 export const ApenasAdmin = async (req: Request, res: Response): Promise<any> => {

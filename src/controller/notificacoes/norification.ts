@@ -1,6 +1,7 @@
 import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
-import { iovariable, userSockets } from "../../index.js";
+import { iovariable, userSockets } from "../../server.ts";
+
 export const CreateNotification = async (
   req: Request,
   res: Response,
@@ -13,7 +14,7 @@ export const CreateNotification = async (
       mensagem,
     },
   });
-  iovariable.to(userSockets[user_id]).emit("notification", {
+  iovariable.to(userSockets[String(user_id)]).emit("notification", {
     message: `apenas ${user_id} pode ver essa notificação`,
   });
   return res.status(201).json("ok");
@@ -24,7 +25,7 @@ export const UnreadNotification = async (
   res: Response,
 ): Promise<any> => {
   const { id } = req.user;
-  const notReadNotification = await prisma.UserNotificacao.findMany({
+  const notReadNotification = await prisma.userNotificacao.findMany({
     where: {
       user_id: id,
       notificacao: { read: false },
@@ -44,11 +45,16 @@ export const ReadNotification = async (
   res: Response,
 ): Promise<any> => {
   const { id } = req.user;
-  const ReadNotifation = await prisma.UserNotificacao.update({
-    where: {
-      user_id:id,
+const ReadNotifation = await prisma.userNotificacao.updateMany({
+  where: {
+    user_id: id,
+    notificacao: {
+      read: false,
     },
-    data:{ read: true}
-  });
+  },
+  data: {
+    read: true, // Nota: Se o campo 'read' estiver na tabela 'Notificacao', veja a observação abaixo
+  },
+});
   return res.status(200).json("ok");
 };

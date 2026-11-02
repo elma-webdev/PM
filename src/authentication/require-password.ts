@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../lib/prisma.js";
 import  { createHash } from "crypto";
 import dotenv from "dotenv";
 import { sendResetPasswordEmail } from "../provider/transporter.js";
 import { BadRequest } from "../error-handler/api-error.js";
 dotenv.config();
 
-const prisma = new PrismaClient();
 
 export const forgotPassword = async (req: Request, res: Response): Promise<any> => {
   const start=Date.now();

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../lib/prisma.js";
 import { createLog } from "../../utils/fcuntion.log.js";
 import jsonwebtoken from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -10,7 +10,6 @@ import { userLoginSchema } from "./types/triagem.zod.js";
 import dayjs from "dayjs";
 dotenv.config();
 
-const prisma = new PrismaClient();
 
 export const loginUser = async function (
   req: Request,

@@ -1,10 +1,11 @@
 import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
-import { iovariable, userSockets } from "../../index.js";
+
 import client from "../../provider/redisConfig.js";
 import { generateZoomMeeting } from "../../provider/zoom-service.js";
 import { ocuparSlot } from "../agenda/agenda.js";
 import { Conflict, NotFound } from "../../error-handler/api-error.js";
+import { iovariable, userSockets } from "../../server.ts";
 
 export const SessaoRequestByPsicologo = async (
   req: Request,

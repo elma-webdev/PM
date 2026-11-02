@@ -5,7 +5,7 @@ import { uploadToSupabase } from "../../provider/supabase.file.js";
 import { Conflict } from "../../error-handler/api-error.js";
 import { patientSchema } from "./types/types.users.js";
 import { prisma } from "../../../lib/prisma.js";
-
+import { z } from "zod";
 export async function createPaciente(
   req: Request,
   res: Response,
@@ -76,7 +76,11 @@ export async function createPaciente(
     await createLog("Novo paciente cadastrado no sistema", 8, paciente.user_id);
     res.status(201).json(paciente);
   } catch (err: unknown) {
-    if (err instanceof Error) {
+    if (err instanceof z.ZodError){
+      console.log(err.issues);
+      return res.status(500).json({ message: 'err.message' });
+    }
+    else if (err instanceof Error) {
       console.log(err);
       return res.status(500).json({ message: err.message });
     }

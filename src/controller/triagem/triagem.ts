@@ -4,7 +4,7 @@ import {createLog} from "../../../utils/fcuntion.log.js"
 import { BadRequest, Conflict, NotFound } from "../../error-handler/api-error.js";
 import client from "../../provider/redisConfig.js";
 import { triagemSchema } from "./types/triagem.zod.js";
-import { iovariable } from "../../index.js";
+import { iovariable } from "../../app.ts";
 
 
 

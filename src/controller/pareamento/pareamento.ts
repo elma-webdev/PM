@@ -1,6 +1,6 @@
 import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
-import { iovariable, userSockets } from "../../index.js";
+import { iovariable, userSockets } from "../../app.ts";
 import client from "../../provider/redisConfig.js";
 import redis from "redis";
 import dotenv from "dotenv";

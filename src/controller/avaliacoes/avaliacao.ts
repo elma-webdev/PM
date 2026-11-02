@@ -6,9 +6,9 @@ import { prisma } from "../../../lib/prisma.js";
 export async function createAvaliacao(req: Request, res: Response): Promise<any> {
   try {
     const {id}=req.user
-    const { sms, psicologoId } = req.body;
+    const { observacao, psicologoId } = req.body;
     const avaliacao = await prisma.avaliacao.create({
-      data: { sms, pacienteAvaliacao: id, psicologoAvaliacao: psicologoId },
+      data: { observacao, psicologo_id: psicologoId, paciente_id:id },
     });
     return res.status(201).json(avaliacao);
   } catch (err: unknown) {

@@ -1,9 +1,9 @@
 import crypto from "crypto"
 import dayjs from "dayjs"
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../lib/prisma.js";
 import dotenv from "dotenv";
 dotenv.config();
-const prisma = new PrismaClient();
+
 
 export const refresh_token = async (
   userId: string,
