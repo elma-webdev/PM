@@ -5,6 +5,9 @@ WORKDIR /app
 # Copia arquivos de dependência
 COPY package*.json ./
 ENV NODE_ENV=development
+
+RUN npm config set fetch-retry-mintimeout 20000
+RUN npm config set fetch-retry-maxtimeout 120000
 # Instala dependências
 RUN npm install
 # Copia os binarios do Prisma
