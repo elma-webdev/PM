@@ -100,13 +100,7 @@ export async function createPsicologo(
     if (err instanceof Error) {
       console.log(err);
       return res.status(500).json({ message: err.message });
-    } else if (err instanceof prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002") {
-        return res.status(409).json({
-          message: "Duplicidade detectada: já existe registro com esse valor.",
-        });
-      }
-    }
+    } 
     return res.status(500).json({ message: "Erro desconhecido." });
   }
 }
@@ -161,7 +155,7 @@ export async function getPsicologoById(
   const id = req.params.id;
   try {
     const psicologo = await prisma.psicologo.findUnique({
-      where: { user_id: id },
+      where: { user_id: String(id) },
       select: {
         user_id: true,
         bio: true,
@@ -218,7 +212,7 @@ export async function updatePsicologo(
 
   try {
     const psicologo = await prisma.psicologo.update({
-      where: { user_id: id },
+      where: { user_id: String(id) },
       data: {
         nome,
         photo: image,
@@ -244,7 +238,7 @@ export async function deletePsicologo(
 
   try {
     await prisma.psicologo.delete({
-      where: { user_id: id },
+      where: { user_id: String(id) },
     });
 
     return res.json({ message: "Psicólogo deletado com sucesso" });
