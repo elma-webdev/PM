@@ -50,8 +50,7 @@ iovariable.on("connection", async (socket) => {
   });
 });
 
-if (process.env.NODE_ENV !== "test") {
-  server.listen(port, () => {
-    console.log(`Servidor rodando em http://localhost:${port}`);
-  });
-}
+//if (process.env.NODE_ENV !== "test") {
+ // server.listen(port, () => {
+ //   console.log(`Servidor rodando em http://localhost:${port}`);
+  //});}
