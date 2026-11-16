@@ -2,41 +2,22 @@ import { Router } from "express";
 import {AgendarSessao, MarcarSessaoInstantanea} from "../controller/pareamento/pareamento.js";
 import { Auth } from "../middleware/Auth.js";
 import {permission_Level1, permission_Level2} from "../middleware/permission.js";
-import {
-  AcceptSessoes,
-  PaySessao,
-  DenySessao,
-  FinishSessao,
-  SessaoRequestByPsicologo,
-  SessaoPaid,
-  GetAllPsicologoSessaoRequestAccepted,
-  GetAllPacienteSessaoRequestAccepted,
-  SessaoRequestByPaciente,
-} from "../controller/pareamento/searcnInDB.js";
-import { getVinculo } from "../controller/pareamento/vinculo.js";
-
+import { criarSessao, visualizarSessoesPorData } from "../controller/agendamento/sessoes.ts";
 
 const sessionRouter = Router();
 
-sessionRouter.get("/vinculo/:psicologo_id", Auth, getVinculo);
-sessionRouter.post(
-  "/sessao/:psicologo_id/instantanea",
-  Auth,
-  MarcarSessaoInstantanea,
-);
-sessionRouter.post("/sessao/:psicologo_id/agendar/:modo", Auth, AgendarSessao);
-sessionRouter.post("/sessao/accept", Auth, AcceptSessoes);
-sessionRouter.patch("/sessao/reject", Auth, DenySessao);
-sessionRouter.patch("/sessao/concluded", Auth, FinishSessao);
-sessionRouter.patch("/sessao/:sessao_id/:pagamento_id/confirm-payment", Auth, PaySessao);
-sessionRouter.get("/sessao/:psicologo_id/pedidos", Auth, SessaoRequestByPsicologo);
-sessionRouter.get("/sessao/paciente/:paciente_id/pedidos", Auth, SessaoRequestByPaciente);
-sessionRouter.get("/sessao/:psicologo_id/pedidos/accepted", Auth, GetAllPsicologoSessaoRequestAccepted);
-sessionRouter.get(
-  "/sessao/paciente/:paciente_id/pedidos/accepted",
-  Auth,
-  GetAllPacienteSessaoRequestAccepted,
-);
-// sessionRouter.get("/sessao/:psicologo_id/paid", Auth, SessaoPaid);
+sessionRouter.post('/sessoes', criarSessao);
+
+// Rota para visualizar sessões por data
+sessionRouter.get('/sessoes', visualizarSessoesPorData);
+
+//Criar Sessão (POST /sessoes):
+
+
+//Buscar por um dia específico (GET /sessoes?data=2026-06-10):
+
+//Buscar por intervalo de datas (GET /sessoes?inicio=2026-06-01&fim=2026-06-30):
+
+//Buscar filtrando por data e status (GET /sessoes?data=2026-06-10&status=AGENDADA):
 
 export { sessionRouter };

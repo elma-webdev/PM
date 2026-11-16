@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 export const getVinculo = async (req: Request, res: Response): Promise<any> => {
   try {
     const { psicologo_id} = req.params;
-    const vinculo = await prisma.PacientePsicologo.findMany({
+    const vinculo = await prisma.pacientePsicologo.findMany({
       where: { psicologo_id },
       include: {
         paciente: {
