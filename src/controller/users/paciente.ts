@@ -6,6 +6,7 @@ import { Conflict } from "../../error-handler/api-error.js";
 import { patientSchema } from "./types/types.users.js";
 import { prisma } from "../../../lib/prisma.js";
 import { z } from "zod";
+
 export async function createPaciente(
   req: Request,
   res: Response,
@@ -74,7 +75,7 @@ export async function createPaciente(
     });
 
     await createLog("Novo paciente cadastrado no sistema", 8, paciente.user_id);
-    res.status(201).json(paciente);
+    return res.status(201).json(paciente);
   } catch (err: unknown) {
     if (err instanceof z.ZodError){
       console.log(err.issues);
@@ -106,7 +107,7 @@ export async function getPacientes(req: Request, res: Response): Promise<any> {
         },
       },
     });
-    res.json(pacientes);
+    return res.json(pacientes);
   } catch (err: unknown) {
     if (err instanceof Error) {
       return res.status(500).json({ message: err.message });
@@ -122,7 +123,7 @@ export async function getPacientesById(
     const { id } = req.params;
     const pacientes = await prisma.paciente.findUnique({
       where: {
-        user_id: id,
+        user_id: String(id),
       },
       select: {
         triagem: true,
@@ -137,7 +138,7 @@ export async function getPacientesById(
         },
       },
     });
-    res.json(pacientes);
+    return res.json(pacientes);
   } catch (err: unknown) {
     if (err instanceof Error) {
       return res.status(500).json({ message: err.message });
