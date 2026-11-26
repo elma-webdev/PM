@@ -8,21 +8,30 @@ import { createHash } from "crypto";
 import { refresh_token } from "../provider/refresh_token_generate.js";
 import { userLoginSchema } from "./types/triagem.zod.js";
 import dayjs from "dayjs";
+import bcrypt from "bcrypt";
+import z from "zod";
 dotenv.config();
-
 
 export const loginUser = async function (
   req: Request,
   res: Response,
 ): Promise<any> {
-  const { email, password } = req.body;
-  const userAgent = req.get("User-Agent") || "unknown-agent";
+
+  try{
+    const userAgent = req.get("User-Agent") || "unknown-agent";
   const ip = req.ip || "unknown-ip";
   const deviceId = `${userAgent}-${ip}`;
 
-  userLoginSchema.parse(req.body);
+   const credenciais=userLoginSchema.safeParse(req.body);
 
-  try {
+   if(!credenciais.success){
+    return res.status(400).json({
+        mensagem: credenciais.error.message,
+      });
+   }
+
+   const {email, password}=credenciais.data
+
     const doesUserExists = await prisma.user.findUnique({
       where: { email },
       include: { psicologo: true },
@@ -43,13 +52,11 @@ export const loginUser = async function (
       }
     }
 
-    const senhaDigitadaHash = createHash("sha256")
-      .update(password)
-      .digest("hex");
+    const senhaValida = await bcrypt.compare(password, doesUserExists.password);
 
-    if (doesUserExists.password !== senhaDigitadaHash) {
-      throw new BadRequest("O e-mail ou a senha está incorreto.");
-    }
+    if (!senhaValida) {
+   throw new BadRequest("Email ou senha inválidos.");
+  }
 
     const token = jsonwebtoken.sign(
       {
@@ -58,7 +65,7 @@ export const loginUser = async function (
         nome: doesUserExists.nome,
       },
       process.env.SCT as string,
-      { expiresIn: "8m" },
+      { expiresIn: "15m"},
     );
 
     const expiresInSeconds = dayjs().add(7, "day").unix();
@@ -84,14 +91,22 @@ export const loginUser = async function (
       maxAge: durationMs
     });
     return res.status(200).json({ user, token });
-  } catch (err: unknown) {
-    if (err instanceof ApiError) {
-      return res.status(err.status).json({ message: err.message });
+  } catch(error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          mensagem: "Dados inválidos.",
+          erros: error.message
+        });
+      }
+      if (error instanceof ApiError) {
+      return res.status(500).json({ message: error.message });
     }
-    console.error(err);
-    res.status(500).json({ message: "Erro desconhecido." });
-  }
-};
+      console.error("Erro ao criar agendamento:", error);
+      return res.status(500).json({
+        mensagem: "Erro interno ao criar agendamento.",
+      });
+    }
+  };
 
 
 export const logoutUser = async (req: Request, res: Response): Promise<any> => {

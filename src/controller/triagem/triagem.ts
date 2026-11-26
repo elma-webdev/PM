@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { prisma } from "../../../lib/prisma.js";
 import {createLog} from "../../../utils/fcuntion.log.js"
-import { BadRequest, Conflict, NotFound } from "../../error-handler/api-error.js";
+import { ApiError, BadRequest, Conflict, NotFound } from "../../error-handler/api-error.js";
 import { triagemSchema } from "./types/triagem.zod.js";
+import z from "zod";
 
 
 
@@ -71,12 +72,21 @@ export const createTriagem = async (
       message: "Dados registrados com sucesso.",
       triagem
     });
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return res.status(500).json({ message: err.message });
+  } catch(error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          mensagem: "Dados inválidos.",
+          erros: error.message
+        });
+      }
+      if (error instanceof ApiError) {
+      return res.status(500).json({ message: error.message });
     }
-    return res.status(500).json({ message: "Erro desconhecido." });
-  }
+      console.error("Erro ao criar agendamento:", error);
+      return res.status(500).json({
+        mensagem: "Erro interno ao criar agendamento.",
+      });
+    }
 };
 
 export const getTriagem = async (req: Request, res: Response): Promise<any> => {

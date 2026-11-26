@@ -5,10 +5,12 @@ import {
   ApiError,
   BadRequest,
   Conflict,
+  NotFound,
 } from "../../error-handler/api-error.js";
-import { createHash } from "node:crypto";
+import bcrypt from "bcrypt";
 import { uploadToSupabase } from "../../provider/supabase.file.js";
 import { psychologistSchema } from "./types/types.users.js";
+import z from "zod";
 
 export async function createPsicologo(
   req: Request,
@@ -21,22 +23,23 @@ export async function createPsicologo(
     }
     const parsed = psychologistSchema.safeParse(req.body);
     if (!parsed.success) {
-      return res.status(409).json({ message: parsed.error });
+      console.log(`${parsed.error.message}`);
+      return res.status(400).json({
+    message: "Erro de validação nos dados enviados.",
+    erros: z.flattenError(parsed.error).fieldErrors,
+  });
     }
     const {
       numero_ordem,
       especialidade,
       bio,
       user,
-      ano_conclusao,
       ano_experiencia,
       contacto,
-      grau_academico,
       idiomas,
       nacionalidade,
       nbi,
       sexo,
-      universidade,
     } = parsed.data;
 
     const { nome, email, password, sobrenome } = user;
@@ -48,9 +51,7 @@ export async function createPsicologo(
     });
 
     if (doesEmailExist) {
-      return res
-        .status(409)
-        .json({ message: "Usuário ja cadastrado no sistema." });
+      throw new Conflict( "Este email já pertence a um usuário.")
     }
 
     const file: any = req.file;
@@ -58,21 +59,19 @@ export async function createPsicologo(
     if (file) {
       image = await uploadToSupabase(file);
     }
-    const hashPassword = createHash("sha256").update(password).digest("hex");
+   const saltRounds = 10;
+const hashPassword = await bcrypt.hash(password, saltRounds);
     const psichologist = await prisma.psicologo.create({
       data: {
         bio,
         especialidade,
         numero_ordem,
-        ano_conclusao,
         ano_experiencia,
         contacto,
-        grau_academico,
         idiomas,
         nacionalidade,
         nbi,
         sexo,
-        universidade,
         user: {
           create: {
             email,
@@ -112,18 +111,12 @@ export async function getPsicologos(req: Request, res: Response): Promise<any> {
         user_id: true,
         bio: true,
         sexo: true,
-        agenda: true,
         contacto: true,
         idiomas: true,
         numero_ordem: true,
         nbi: true,
-        grau_academico: true,
         especialidade: true,
-        nacionalidade: true,
-        universidade: true,
-        ano_conclusao: true,
         ano_experiencia: true,
-        modalidade: true,
         user: {
           select: {
             photo: true,
@@ -141,7 +134,7 @@ export async function getPsicologos(req: Request, res: Response): Promise<any> {
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("ERRO NO GET PSICOLOGOS:", err);
-      return res.status(500).json({ message: err.message });
+      return res.status(500).json({ message: err.name });
     }
     console.error("ERRO NO GET PSICOLOGOS:");
     return res.status(500).json({ message: "Erro desconhecido." });
@@ -156,42 +149,36 @@ export async function getPsicologoById(
   try {
     const psicologo = await prisma.psicologo.findUnique({
       where: { user_id: String(id) },
-      select: {
+     select: {
         user_id: true,
         bio: true,
         sexo: true,
-        agenda: true,
         contacto: true,
         idiomas: true,
         numero_ordem: true,
         nbi: true,
-        grau_academico: true,
         especialidade: true,
-        nacionalidade: true,
-        universidade: true,
-        ano_conclusao: true,
         ano_experiencia: true,
-        modalidade: true,
         user: {
           select: {
             photo: true,
             createdAt: true,
-            nome: true,
-            sobrenome: true,
-            email: true,
+            nome:true,
+            sobrenome:true,
+            email:true
           },
         },
-        posts: true,
         avaliacao: true,
+        posts:true
       },
     });
 
     if (!psicologo) {
-      return res.status(404).json({ message: "Psicólogo não encontrado" });
+      throw new NotFound("Psicólogo não encontrado");
     }
     return res.json(psicologo);
   } catch (err: unknown) {
-    if (err instanceof Error) {
+    if (err instanceof ApiError) {
       return res.status(500).json({ message: err.message });
     }
     return res.status(500).json({ message: "Erro desconhecido." });
@@ -223,8 +210,8 @@ export async function updatePsicologo(
 
     return res.json(psicologo);
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      return res.status(500).json({ message: err.message });
+    if (err instanceof ApiError) {
+      return res.status(err.status).json({ message: err.message });
     }
     return res.status(500).json({ message: "Erro desconhecido." });
   }
@@ -243,8 +230,8 @@ export async function deletePsicologo(
 
     return res.json({ message: "Psicólogo deletado com sucesso" });
   } catch (err: unknown) {
-    if (err instanceof Error) {
-      return res.status(500).json({ message: err.message });
+    if (err instanceof ApiError) {
+      return res.status(err.status).json({ message: err.message });
     }
     return res.status(500).json({ message: "Erro desconhecido." });
   }
@@ -254,10 +241,19 @@ export async function getUsers(req: Request, res: Response): Promise<any> {
   try {
     const users = await prisma.user.findMany({});
     return res.json(users);
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      return res.status(500).json({ message: err.message });
-    }
-    return res.status(500).json({ message: "Erro desconhecido." });
-  }
+  } catch(error) {
+        if (error instanceof z.ZodError) {
+          return res.status(400).json({
+            mensagem: "Dados inválidos.",
+            erros: error.name
+          });
+        }
+        if (error instanceof ApiError) {
+        return res.status(error.status).json({ message: error.name });
+      }
+        console.error("Erro ao criar agendamento:", error);
+        return res.status(500).json({
+          mensagem: "Erro interno ao criar agendamento.",
+        });
+      }
 }

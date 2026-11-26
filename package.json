@@ -18,10 +18,10 @@
     "swagger": "tsx swagger.ts",
     "fila:drop": "tsx src/controller/fila/drop.ts",
     "compose:exec": "docker compose exec db psql -U postgres",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/juncao.ts"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+   "seed": "tsx prisma/paciente.ts && tsx prisma/psicologo.ts"
   },
   "keywords": [],
   "author": "",

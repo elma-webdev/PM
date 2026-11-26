@@ -1,8 +1,9 @@
 import jsonwebtoken from "jsonwebtoken";
 import dayjs from "dayjs";
-import { BadRequest } from "../error-handler/api-error.js";
+import { ApiError, BadRequest } from "../error-handler/api-error.js";
 import { prisma } from "../../lib/prisma.js";
 import { Request, Response } from "express";
+import z from "zod";
 
 export const RefreshToken = async (
   req: Request,
@@ -40,7 +41,7 @@ export const RefreshToken = async (
         nome: is_refresh_token.user.nome,
       },
       process.env.SCT as string,
-      { expiresIn: "8m" },
+      { expiresIn: "15m" },
     );
 
     // Rotação opcional
@@ -67,8 +68,19 @@ export const RefreshToken = async (
     });
 
     return res.status(200).json({ token });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Erro no refresh token" });
-  }
+  } catch(error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          mensagem: "Dados inválidos.",
+          erros: error.message
+        });
+      }
+      if (error instanceof ApiError) {
+      return res.status(500).json({ message: error.message });
+    }
+      console.error("Erro ao criar agendamento:", error);
+      return res.status(500).json({
+        mensagem: "Erro interno ao criar agendamento.",
+      });
+    }
 };

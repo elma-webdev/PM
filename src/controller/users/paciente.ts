@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { createLog } from "../../../utils/fcuntion.log.js";
 import { createHash } from "node:crypto";
 import { uploadToSupabase } from "../../provider/supabase.file.js";
-import { Conflict } from "../../error-handler/api-error.js";
+import { ApiError, Conflict } from "../../error-handler/api-error.js";
 import { patientSchema } from "./types/types.users.js";
 import { prisma } from "../../../lib/prisma.js";
 import { z } from "zod";
@@ -18,10 +18,10 @@ export async function createPaciente(
     }
     const parsed = patientSchema.safeParse(req.body);
     if (!parsed.success) {
-      console.log(parsed.error);
-      return res.status(400).json({ message: parsed.error });
+      console.log(parsed.error.message);
+      return res.status(400).json({ message: parsed.error.message });
     }
-    const { idade, telefone, user } = parsed.data;
+    const { idade, telefone, user, nbi } = parsed.data;
     const { nome, email, password, sobrenome } = user;
     const doesUserExist = await prisma.user.findFirst({
       where: {
@@ -46,6 +46,7 @@ export async function createPaciente(
     const paciente = await prisma.paciente.create({
       data: {
         idade,
+        nbi,
         telefone,
         user: {
           create: {
@@ -76,17 +77,21 @@ export async function createPaciente(
 
     await createLog("Novo paciente cadastrado no sistema", 8, paciente.user_id);
     return res.status(201).json(paciente);
-  } catch (err: unknown) {
-    if (err instanceof z.ZodError){
-      console.log(err.issues);
-      return res.status(500).json({ message: 'err.message' });
+  } catch(error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          mensagem: "Dados inválidos.",
+          erros: error.message
+        });
+      }
+      if (error instanceof ApiError) {
+      return res.status(500).json({ message: error.message });
     }
-    else if (err instanceof Error) {
-      console.log(err);
-      return res.status(500).json({ message: err.message });
+      console.error("Erro ao criar agendamento:", error);
+      return res.status(500).json({
+        mensagem: "Erro interno ao criar agendamento.",
+      });
     }
-    return res.status(500).json({ message: "Erro desconhecido." });
-  }
 }
 
 export async function getPacientes(req: Request, res: Response): Promise<any> {

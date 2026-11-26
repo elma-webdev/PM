@@ -1,18 +1,13 @@
 import { Router } from "express";
-import {AgendarSessao, MarcarSessaoInstantanea} from "../controller/pareamento/pareamento.js";
 import { Auth } from "../middleware/Auth.js";
 import {permission_Level1, permission_Level2} from "../middleware/permission.js";
-import { criarSessao, visualizarSessoesPorData } from "../controller/agendamento/sessoes.ts";
+import { criarSessao, visualizarSessoesPorData } from "../controller/sessao/sessoes.ts";
 
 const sessionRouter = Router();
 
 sessionRouter.post('/sessoes', criarSessao);
 
-// Rota para visualizar sessões por data
 sessionRouter.get('/sessoes', visualizarSessoesPorData);
-
-//Criar Sessão (POST /sessoes):
-
 
 //Buscar por um dia específico (GET /sessoes?data=2026-06-10):
 

@@ -1,4 +1,4 @@
-import { prisma } from "../../../lib/prisma.js";
+import { prisma } from "../../../lib/prisma.ts";
 import { Request, Response } from "express";
 import { iovariable, userSockets } from "../../server.ts";
 
