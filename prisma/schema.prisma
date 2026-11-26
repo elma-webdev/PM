@@ -35,7 +35,7 @@ enum EstadoSessao {
 
 model Agendamento {
   agendamento_id String @id @default(uuid())
-
+  pref_genero Int?
   modo_sessao Int @default(0)
 
   psicologo_id String?
@@ -140,7 +140,7 @@ model Sessao {
 model Pagamento {
   pagamento_id String @id @default(uuid())
 
-  agendamento_id String
+  agendamento_id String 
   agendamento Agendamento @relation(fields: [agendamento_id], references: [agendamento_id], onDelete: Restrict)
 
   valor Decimal @db.Decimal(10, 2)
@@ -258,9 +258,9 @@ model User {
   updatedAt          DateTime            @default(now())
   refreshToken       RefreshToken[]
   notificacoes UserNotificacao[]
-  paciente           Paciente?
+  paciente           Paciente? 
   passwordResetCodes PasswordResetCode[]
-  psicologo          Psicologo?
+  psicologo          Psicologo? 
   mensagensEnviadas  Mensagem[] @relation("MensagensEnviadas")
   mensagensRecebidas Mensagem[] @relation("MensagensRecebidas")
   @@map("users")

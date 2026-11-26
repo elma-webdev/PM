@@ -9,7 +9,7 @@ import {
   CreateNotification,
   UnreadNotification,
   ReadNotification,
-} from "../controller/notificacoes/norification.js";
+} from "../controller/notificacoes/notificacao.ts";
 const adminRouter = Router();
 
 adminRouter.post("/admin", createAdmin)

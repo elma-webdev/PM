@@ -1,30 +1,14 @@
-### Variables 
-@apiurl = http://localhost:3000/api/
-
-
-###
-
-POST http://localhost:3000/api/forgot-password
+### Criar agendamento
+POST http://localhost:3000/api/agendamento
 Content-Type: application/json
-# Authorization: Bearer ACCESS-TOKEN
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjNlMDc0MGU3LWUzMzEtNDU5NC1iNjllLTgwZjA0Njg2YzgwNiIsInJvbGUiOjAsIm5vbWUiOiJBbmEiLCJpYXQiOjE3OTU2NDE1MDIsImV4cCI6MTc5NTY0MjQwMn0.Y1A6CQL9e6mA_QJJzrEJ9w8E2cVL9FJgXVYyRTJp5kg
 
 {
-    "email": "juelma@gmail.com"
+  "modo_sessao": 1,
+  "psicologo_id": "18fc2830-ec1b-42a1-b095-4ee1a53dc54d",
+  "dataInicio": "2026-11-26T09:00:00+01:00",
+  "duracaoMinutos": 45
 }
-###
-POST http://localhost:3000/api/reset-password
-Content-Type: application/json
-# Authorization: Bearer ACCESS-TOKEN
-
-{
-    "email": "juelma@gmail.com",
-    "code":"2966",
-    "newPassword":"admin123"
-}
-
-###
-GET http://localhost:3000/api/vinculo/bb0d208c-4021-4901-8741-a5ec63419ec5
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODc3MTExNzYsImV4cCI6MTc4NzcxMTY1Nn0.wpfw0TSn7T8giC6SCxhHIYtjLzC7751XJU4PecYhrAQ
 
 ### psicologos sessao
 GET http://localhost:3000/api/sessao/bb0d208c-4021-4901-8741-a5ec63419ec5/pedidos
@@ -41,70 +25,21 @@ Content-Type: application/json
 GET http://localhost:3000/api/sessao/bb0d208c-4021-4901-8741-a5ec63419ec5/pedidos/accepted
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODc2OTEyMDgsImV4cCI6MTc4NzY5MTY4OH0.W0hsIy5m8laJEO3ERF2hYU3tFRIbsPtNhVUWCDIlCgQ
 
-###
-POST http://localhost:3000/api/psicologo
-Content-Type: application/json
-
-{
-  "especialidade": "Psicologia clínica",
-  "numero_ordem": "01010101111",
-  "user": {
-      "email": "lura@example.com",
-      "password": "User123_",
-      "nome": "Lura",
-      "sobrenome": "Nunes"
-  }
-}
-
-###
-
-POST http://localhost:3000/api/paciente
-Content-Type: application/json
-
-{
-  "telefone": "940019234",
-  "idade":25,
-  "user": {
-      "email": "anaww@example.com",
-      "password": "AnaLima123_",
-      "role": 0,
-      "nome": "Ana Silva",
-      "sobrenome": "Lima"
-  }
-}
 
 ### 
 GET htt/p://localhost:3000/api/pareamento
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODQ4MTU5NzcsImV4cCI6MTc4NDgxNjQ1N30.CnjqsrMhXbqINShD-HOrCta0DASypgdXpszZfyFW04Y
 
-iiiiiiii
-###
 ###
 
 GET http://localhost:3000/api/notification/unread
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImJiMGQyMDhjLTQwMjEtNDkwMS04NzQxLWE1ZWM2MzQxOWVjNSIsInJvbGUiOjEsIm5vbWUiOiJKb25hcyIsImlh;kkkiidCI6MTc5MDUyMzk5NSwiZXhwIjoxNzkwNTI0NDc1fQ.uS_Aa4P4_jr8mPpnyTFDQXbOwqco_UnyHdhRB5Wq8TI
-###vgftt5egf nnnnnnnnnnzbc
 
-POST http://localhost:3000/api/login
-Content-Type: application/json
-
-{
-    "email": "anaww@example.com",
-    "password": "AnaLima123_"
-}
 
 ####
 GET http://localhost:3000/api/psicologo
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjA1NDYzMzFkLTNlMTMtNDNjNS04YjMzLTkwM2M3YWE4ODVhZCIsInJvbGUiOjAsIm5vbWUiOiJBbmEgU2lsdmEiLCJpYXQiOjE3ODkwNjkxMTMsImV4cCI6MTc4OTA2OTU5M30.8EcJZP95AXILfgtwndi9Via9zfU3Jqe8ImfKPc05i4o
 
-#### Refresh token
-
-POST http://localhost:3000/api/refresh
-Content-Type: application/json
-
-{
-    "refresh":"a88d7720-fc03-4602-84f3-dcad913ed737"
-}
 
 ###
 POST http://localhost:3000/api/sessao/accept

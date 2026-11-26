@@ -1,0 +1,76 @@
+### Criar psicologo
+
+POST http://localhost:3000/api/psicologo
+Content-Type: application/json
+
+{
+  "especialidade": "Psicologia clínica",
+  "numero_ordem": "01010101111",
+  "nbi":"00990200LA045",
+  "user": {
+      "email": "lura@example.com",
+      "password": "User123_",
+      "nome": "Lura",
+      "sobrenome": "Nunes"
+  }
+}
+
+### Criar paciente
+
+POST http://localhost:3000/api/paciente
+Content-Type: application/json
+
+{
+  "especialidade": "Psicologia clínica",
+  "numero_ordem": "01010101111",
+  "nbi": "009902001LA045",
+  "user": {
+      "email": "lura@example.com",
+      "password": "User123_",
+      "nome": "Lura",
+      "sobrenome": "Nunes"
+  }
+}
+
+
+### Pedir parar resetar senha
+POST http://localhost:3000/api/reset-password
+Content-Type: application/json
+
+{ 
+"email": "", 
+"code":"0000", 
+"password":"0111J_1uhal" 
+}
+
+### Fazer login
+
+POST http://localhost:3000/api/login
+Content-Type: application/json
+
+{
+    "email": "ana.mendes@example.com",
+    "password": "User123_"
+}
+
+### Esqueci a senha
+
+POST http://localhost:3000/api/forgot-password
+Content-Type: application/json
+# Authorization: Bearer ACCESS-TOKEN
+
+{
+    "email": "juelma@gmail.com"
+}
+
+
+#### Refresh token
+
+POST http://localhost:3000/api/refresh
+Content-Type: application/json
+Authorization: Bearer equumkss.iurgf
+
+{
+    "refresh":"a88d7720-fc03-4602-84f3-dcad913ed737"
+}
+

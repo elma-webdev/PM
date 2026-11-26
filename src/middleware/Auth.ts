@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { Unauthorized } from "../error-handler/api-error.ts";
 
 dotenv.config();
 const authConfig =
@@ -10,7 +11,7 @@ export const Auth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    res.status(401).send({ error: "No token provider" });
+    res.status(401).send({ error: "Não possui permissão." });
     return;
   }
   const parts: string[] = authHeader.split(" ");
@@ -23,14 +24,14 @@ export const Auth = (req: Request, res: Response, next: NextFunction) => {
   const [scheme, token] = parts;
 
   if (!/^Bearer$/i.test(scheme)) {
-    res.status(401).send({ error: "Token malFormatted" });
-    return;
+    throw new Unauthorized("Token mal formatado.")
+    //return;
   }
 
   jwt.verify(token, authConfig, (error, decoded) => {
     if (error) {
-      res.status(401).send({ error: "Token invalid" });
-      return;
+      throw new Unauthorized("Token inválido");
+      //return;
     }
 
     const payload = decoded as { id: string, role: number};

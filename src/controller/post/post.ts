@@ -2,6 +2,7 @@ import { prisma } from "../../../lib/prisma.js";
 import { Request, Response } from "express";
 import { postSchema } from "./types/types.zod.js";
 import { ApiError } from "../../error-handler/api-error.js";
+import z from "zod";
 
 export async function createPost(
   req: Request,
@@ -36,7 +37,6 @@ export async function getPosts(
   res: Response,
 ): Promise<any> {
   
-
   try{
     const posts = await prisma.post.findMany({});
     return res.status(200).json(posts);
@@ -62,7 +62,7 @@ export async function getPostsByUser(
     const {id} = req.params
     const posts = await prisma.post.findMany({
      where:{
-       psicologo_id: id
+       psicologo_id: String(id)
      }
     });
     return res.status(200).json(posts);
@@ -71,6 +71,12 @@ export async function getPostsByUser(
     if (err instanceof ApiError) {
       console.error("ERRO NO GET PSICOLOGOS:", err);
       return res.status(500).json({ message: err.message });
+    }
+    if (err instanceof z.ZodError) {
+            return res.status(400).json({
+              mensagem: "Dados inválidos.",
+              erros: err.message
+        });
     }
     console.error(err);
     return res.status(500).json({ message: "Erro desconhecido." });

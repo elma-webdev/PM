@@ -7,6 +7,25 @@ const client_id="f1CVYsAORXa8Swqu7OPEDw"
 const client_secret="0bvWKcEcXwJ3qRSMap2uT78nmW60TO9m"
 const secret_token="yZos4i6eSoSbpHON-Jhvgw"
 
+
+
+
+interface ZoomMeetingResponse {
+  id: number;
+  join_url: string;
+  password?: string;
+  start_url: string;
+  created_at: string;
+  agenda: string;
+  host_id: string;
+  host_email: string;
+  type: number;
+  status: string;
+  topic: string;
+  duration: number;
+}
+
+
 // curl -X POST https://zoom.us/oauth/token -d 'grant_type=account_credentials' -d 'account_id=8ZB81vbYRn6w0SNPVZBotg' -H 'Host: zoom.us' -H 'Authorization: Basic Base64Encoded(f1CVYsAORXa8Swqu7OPEDw:0bvWKcEcXwJ3qRSMap2uT78nmW60TO9m)'
 
 const getAuthHeaders = () => {
@@ -38,7 +57,7 @@ const generateZoomToken = async() : Promise<any> => {
 }
 
 
-export const generateZoomMeeting = async ( inicio?: Date, tipo?: number) => {
+export const generateZoomMeeting = async ( inicio?: Date, tipo?: number, duracao?:number) : Promise<ZoomMeetingResponse> => {
     try {
         const zoomAccessToken = await generateZoomToken();
 
@@ -53,7 +72,7 @@ export const generateZoomMeeting = async ( inicio?: Date, tipo?: number) => {
                 body: JSON.stringify({
                     agenda: "Sessão de saúde mental",
                     default_password: false,
-                    duration: 40,
+                    duration: duracao || 45,
                     password: "sessao123",
                     settings: {
                         allow_multiple_devices: true,
@@ -98,30 +117,16 @@ export const generateZoomMeeting = async ( inicio?: Date, tipo?: number) => {
                     start_time: inicio?.toISOString() || new Date().toISOString(),
                     timezone: "Africa/Luanda",
                     topic: "Sessão de saúde mental",
-                    type: tipo || 1, // 1 -> Instant Meeting, 2 -> Scheduled Meeting
+                    type: tipo || 2, // 1 -> Instant Meeting, 2 -> Scheduled Meeting
                 }),
             }
         );
 
         const jsonResponse = await response.json();
-        return jsonResponse
+        return jsonResponse as ZoomMeetingResponse
     } catch (error) {
         console.log("generateZoomMeeting Error --> ", error);
         throw error;
     }
 };
 
-    // const meetingPayload = {
-    //   id: meeting.id,
-    //   join_url: meeting.join_url,
-    //   password: meeting.password,
-    //   start_url: meeting.start_url,
-    //   created_at: meeting.created_at,
-    //   agenda: meeting.agenda,
-    //   host_id: meeting.host_id,
-    //   host_email: meeting.host_email,
-    //   type: meeting.type,
-    //   status: meeting.status,
-    //   topic: meeting.topic,
-    //   duration: meeting.duration,
-    // };

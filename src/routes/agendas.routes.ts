@@ -6,14 +6,14 @@ import { filtrarAgendamentoPorEstado, filtrarAgendamentoPorNomePsicologo, filtra
 const agendaRouter=Router()
 
 // Criar agendamento
-agendaRouter.post("/agendamento", criarAgendamento);
+agendaRouter.post("/agendamento", Auth, criarAgendamento);
 
-// Filtrar por estado
-agendaRouter.get("agendamentos/estado?estado=CONFIRMADO", filtrarAgendamentoPorEstado);
+// Filtrar por estado?estado=CONFIRMADO
+agendaRouter.get("agendamentos/estado", Auth, filtrarAgendamentoPorEstado);
 
-// Filtrar pelo nome do psicólogo
-agendaRouter.get("agendamentos/psicologo?nome=Manuel", filtrarAgendamentoPorNomePsicologo);
+// Filtrar pelo nome do psicólogo?nome=Manuel
+agendaRouter.get("agendamentos/psicologo", Auth, filtrarAgendamentoPorNomePsicologo);
 
 // Filtrar pelo ID do psicólogo
-agendaRouter.get("/agendamentos/psicologo/:psicologo_id", filtrarAgendamentoPorPsicologoId);
+agendaRouter.get("/agendamentos/psicologo/:psicologo_id", Auth, filtrarAgendamentoPorPsicologoId);
 export {agendaRouter}

@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { prisma } from "../../../lib/prisma.ts";
 import { EstadoPagamento } from '../../../generated/prisma/enums.ts';
 import { Prisma } from '../../../generated/prisma/client.ts';
+import z from 'zod';
+import { ApiError } from '../../error-handler/api-error.ts';
 
 export const criarPagamento = async (req: Request, res: Response):Promise <any> => {
   try {
@@ -59,10 +61,21 @@ export const criarPagamento = async (req: Request, res: Response):Promise <any> 
     });
 
     return res.status(201).json(novoPagamento);
-  } catch (error) {
-    console.error('Erro ao criar pagamento:', error);
-    return res.status(500).json({ error: 'Erro interno ao registar pagamento.' });
-  }
+  } catch(error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          mensagem: "Dados inválidos.",
+          erros: error.message
+        });
+      }
+      if (error instanceof ApiError) {
+      return res.status(500).json({ message: error.message });
+    }
+      console.error("Erro ao criar agendamento:", error);
+      return res.status(500).json({
+        mensagem: "Erro interno ao criar agendamento.",
+      });
+    }
 };
 
 /**
@@ -130,7 +143,7 @@ export const atualizarPagamento = async (req: Request, res: Response) => {
     const { estado, metodoPagamento, referencia, dataPagamento, valor } = req.body;
 
     const pagamentoExiste = await prisma.pagamento.findUnique({
-      where: { pagamento_id: id },
+      where: { pagamento_id: String(id) },
     });
 
     if (!pagamentoExiste) {
@@ -138,7 +151,7 @@ export const atualizarPagamento = async (req: Request, res: Response) => {
     }
 
     const pagamentoAtualizado = await prisma.pagamento.update({
-      where: { pagamento_id: id },
+      where: { pagamento_id: String(id) },
       data: {
         ...(estado && { estado: estado as EstadoPagamento }),
         ...(metodoPagamento !== undefined && { metodoPagamento }),
@@ -168,7 +181,7 @@ export const buscarPagamentoPorId = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const pagamento = await prisma.pagamento.findUnique({
-      where: { pagamento_id: id },
+      where: { pagamento_id: String(id) },
       include: {
         agendamento: true,
       },

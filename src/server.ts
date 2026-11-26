@@ -4,7 +4,7 @@ import { Server } from "socket.io";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import client from "./provider/redisConfig.ts";
-import app from "./app.ts"; // Importa o app limpo do index.ts
+import app from "./app.ts"; 
 
 dotenv.config();
 const server = createServer(app);
@@ -39,18 +39,18 @@ iovariable.on("connection", async (socket) => {
     socket.join("admins");
   } else if (role === 1) {
     socket.join("psicologos");
-    await client.set(`psicologo:${id}`, JSON.stringify({ isLogged: 1 }));
+   // await client.set(`psicologo:${id}`, JSON.stringify({ isLogged: 1 }));
   } else {
     socket.join("pacientes");
   }
 
-  socket.on("disconnect", async () => {
-    await client.set(`psicologo:${id}`, JSON.stringify({ isLogged: 0 }));
-    delete userSockets[id];
-  });
+  //socket.on("disconnect", async () => {
+   // await client.set(`psicologo:${id}`, JSON.stringify({ isLogged: 0 }));
+    //delete userSockets[id];
+  //});
 });
 
-//if (process.env.NODE_ENV !== "test") {
- // server.listen(port, () => {
- //   console.log(`Servidor rodando em http://localhost:${port}`);
-  //});}
+if (process.env.NODE_ENV !== "test") {
+ server.listen(port, () => {
+ console.log(`Servidor rodando em http://localhost:${port}`);
+})}

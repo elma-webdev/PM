@@ -1,3 +1,6 @@
+import { EstadoAgendamento } from "../generated/prisma/enums.ts";
+import { prisma } from "../lib/prisma.ts";
+
 export function calcularDataFim(dataInicio: Date, duracaoMinutos: number): Date {
   return new Date(dataInicio.getTime() + duracaoMinutos * 60 * 1000);
 }
@@ -63,3 +66,29 @@ export function validarHorarioAtendimento(
 
   return { valido: true };
 }
+
+
+export const temConflitoHorario = async (
+  psicologoId: string,
+  dataInicio: Date,
+  dataFim: Date
+): Promise<boolean> => {
+  const conflito = await prisma.agendamento.findFirst({
+    where: {
+      psicologo_id: psicologoId,
+      AND: [
+        { dataInicio: { lt: dataFim } },
+        { dataFim: { gt: dataInicio } },
+      ],
+      OR: [
+        { estado: EstadoAgendamento.CONFIRMADO },
+        {
+          estado: EstadoAgendamento.PENDENTE_PAGAMENTO,
+          expiracaoReserva: { gt: new Date() },
+        },
+      ],
+    },
+  });
+
+  return Boolean(conflito);
+};

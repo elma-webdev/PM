@@ -3,30 +3,33 @@ import { Request, Response } from "express";
 
 import client from "../../provider/redisConfig.ts";
 import { generateZoomMeeting } from "../../provider/zoom-service.ts";
-import { Conflict, NotFound } from "../../error-handler/api-error.ts";
+import { ApiError, Conflict, NotFound } from "../../error-handler/api-error.ts";
 import { iovariable, userSockets } from "../../server.ts";
 import { EstadoSessao } from "../../../generated/prisma/enums.ts";
 import { Prisma } from "../../../generated/prisma/client.ts";
+import { sessao_schema } from "./types/sessao.schema.ts";
+import z from "zod";
 
 export const criarSessao = async (req: Request, res:Response):Promise <any>=> {
   try {
-    const { agendamento_id, status, inicio, fim, extra_data } = req.body;
+    const sessao = sessao_schema.safeParse(req.body);
 
-    // Validação básica
-    if (!agendamento_id) {
-      return res.status(400).json({ error: 'O campo agendamento_id é obrigatório.' });
+    if (!sessao.success){
+      return res.status(400).json({
+        mensagem: sessao.error?.message
+      });
     }
 
-    // Verifica se o agendamento existe
-    const agendamentoExiste = await prisma.agendamento.findUnique({
-      where: { agendamento_id }
+    const {agendamento_id, status}= sessao.data
+
+    const agendamentoExiste = await prisma.agendamento.findFirst({
+      where: { agendamento_id, estado:"PENDENTE_PAGAMENTO"}
     });
 
     if (!agendamentoExiste) {
       return res.status(404).json({ error: 'Agendamento não encontrado.' });
     }
-
-    // Como agendamento_id é @unique, verifica se já existe sessão para ele
+    
     const sessaoExistente = await prisma.sessao.findUnique({
       where: { agendamento_id }
     });
@@ -35,25 +38,55 @@ export const criarSessao = async (req: Request, res:Response):Promise <any>=> {
       return res.status(400).json({ error: 'Já existe uma sessão para este agendamento.' });
     }
 
-    // Cria a sessão
+    let extra_data: Prisma.InputJsonValue | undefined = undefined;
+
+    if (agendamentoExiste.modo_sessao === 0) {
+    const gerarLinkZoom = await generateZoomMeeting(
+    agendamentoExiste.dataInicio,
+    undefined,
+    agendamentoExiste.duracaoMinutos);
+
+  extra_data = {
+    id: gerarLinkZoom.id,
+    join_url: gerarLinkZoom.join_url,
+    password: gerarLinkZoom.password ?? null,
+    start_url: gerarLinkZoom.start_url,
+    created_at: gerarLinkZoom.created_at,
+    agenda: gerarLinkZoom.agenda,
+    host_id: gerarLinkZoom.host_id,
+    host_email: gerarLinkZoom.host_email,
+    type: gerarLinkZoom.type,
+    status: gerarLinkZoom.status,
+    topic: agendamentoExiste.observacao ?? gerarLinkZoom.topic,
+    duration: gerarLinkZoom.duration,
+  };
+    }
+    
     const novaSessao = await prisma.sessao.create({
       data: {
-        agendamento_id,
-        status: status || 'AGENDADA',
-        inicio: inicio ? new Date(inicio) : null,
-        fim: fim ? new Date(fim) : null,
-        extra_data: extra_data || null
-      },
-      include: {
-        agendamento: true // Retorna os dados do agendamento junto
-      }
-    });
+       agendamento_id,
+       status: status || 'AGENDADA',
+       inicio: agendamentoExiste.dataInicio,
+       fim:  agendamentoExiste.dataFim,
+       extra_data
+    }});
 
     return res.status(201).json(novaSessao);
-  } catch (error) {
-    console.error('Erro ao criar sessão:', error);
-    return res.status(500).json({ error: 'Erro interno ao criar sessão.' });
-  }
+  } catch(error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          mensagem: "Dados inválidos.",
+          erros: error.message
+        });
+      }
+      if (error instanceof ApiError) {
+      return res.status(500).json({ message: error.message });
+    }
+      console.error("Erro ao criar agendamento:", error);
+      return res.status(500).json({
+        mensagem: "Erro interno ao criar agendamento.",
+      });
+    }
 };
 
 /**
@@ -93,7 +126,7 @@ export const visualizarSessoesPorData = async (req: Request, res:Response):Promi
     const sessoes = await prisma.sessao.findMany({
       where: whereClause,
       include: {
-        agendamento: true // Traz os detalhes do agendamento relacionado
+        agendamento: true 
       },
       orderBy: {
         inicio: 'asc'
